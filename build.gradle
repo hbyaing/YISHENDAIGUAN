@@ -1,5 +1,5 @@
 plugins { id 'java'; id 'net.minecraftforge.gradle' version '[6.0,6.2)' }
-version='1.12.0'
+version='1.18.1'
 group='dev.starcrown'
 base { archivesName='YiShenDaiGuan-1.20.1' }
 java.toolchain.languageVersion=JavaLanguageVersion.of(17)
@@ -13,6 +13,9 @@ jar { exclude "dev/starcrown/Qa*" }
 
 jar { manifest { attributes(["MixinConfigs":"starcrowndoll.mixins.json"]) } }
 tasks.withType(JavaCompile).configureEach { options.compilerArgs += ["-proc:none"] }
+
+// Explicitly opt in to the separate acceptance mod; never include it in the release JAR.
+if (project.hasProperty('qa')) { apply from: 'tools/qa/runtime.gradle' }
 
 minecraft.runs { server { workingDirectory project.file('run-server'); args '--mixin', 'starcrowndoll.mixins.json', '--nogui'; mods { starcrowndoll { source sourceSets.main } } } }
 

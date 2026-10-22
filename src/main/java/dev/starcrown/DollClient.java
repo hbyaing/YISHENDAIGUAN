@@ -18,7 +18,12 @@ import com.mojang.math.Axis;
 @Mod.EventBusSubscriber(modid=StarcrownDoll.ID,bus=Mod.EventBusSubscriber.Bus.MOD,value=Dist.CLIENT)
 public class DollClient {
  public static void yuleTooltip(java.util.List<net.minecraft.network.chat.Component> lines,boolean expanded){
-  if(expanded)for(String key:new String[]{"yule.animation","wear","music","yule.feast","place"})lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll."+key).withStyle(net.minecraft.ChatFormatting.GRAY));
+  if(expanded){
+   lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.virtues").withStyle(net.minecraft.ChatFormatting.GOLD));
+   var description=net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.humility").withStyle(net.minecraft.ChatFormatting.GRAY);
+   lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.humility.name").withStyle(net.minecraft.ChatFormatting.BOLD).append(description.withStyle(net.minecraft.network.chat.Style.EMPTY.withColor(net.minecraft.ChatFormatting.GRAY).withBold(false))));
+   for(String key:new String[]{"yule.animation","wear","music","yule.feast","place"})lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll."+key).withStyle(net.minecraft.ChatFormatting.GRAY));
+  }
   else lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.shift").withStyle(net.minecraft.network.chat.Style.EMPTY.withColor(0x999999)));
  }
  @SubscribeEvent public static void musicSetup(net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent e){e.enqueueWork(()->StarcrownDoll.musicListener=DollMusic::toggle);}
@@ -45,6 +50,8 @@ public class DollClient {
  record Provider(SpriteSet sprites) implements ParticleProvider<SimpleParticleType>{public Particle createParticle(SimpleParticleType type,ClientLevel l,double x,double y,double z,double dx,double dy,double dz){return new Star(l,x,y,z,dx,dy,dz,sprites);}}
  @Mod.EventBusSubscriber(modid=StarcrownDoll.ID,value=Dist.CLIENT)
  public static class WorldEvents {
+  @SubscribeEvent public static void yuleTooltipWidth(RenderTooltipEvent.GatherComponents event){if(event.getItemStack().is(StarcrownDoll.YULE_ITEM.get()))event.setMaxWidth(Math.min(340,event.getScreenWidth()-24));}
+  @SubscribeEvent public static void humilitySizes(TickEvent.ClientTickEvent event){if(event.phase==TickEvent.Phase.END&&Minecraft.getInstance().level!=null)for(var player:Minecraft.getInstance().level.players())YuleHumility.updateSize(player);}
   @SubscribeEvent public static void tooltip(net.minecraftforge.event.entity.player.ItemTooltipEvent e){
    if(!StarcrownDoll.isDoll(e.getItemStack()))return;
    if(e.getItemStack().is(StarcrownDoll.YULE_ITEM.get())){
@@ -52,18 +59,7 @@ public class DollClient {
     return;
    }
    if(net.minecraft.client.gui.screens.Screen.hasShiftDown()){
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.skill1").withStyle(net.minecraft.ChatFormatting.GOLD));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.skill1.effect").withStyle(net.minecraft.ChatFormatting.GRAY));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.skill1.protect").withStyle(net.minecraft.ChatFormatting.GRAY));
-
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.skill2").withStyle(net.minecraft.ChatFormatting.AQUA));
-    for(String key:new String[]{"travel","build","immune"})e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.skill2."+key).withStyle(net.minecraft.ChatFormatting.GRAY));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.skill3").withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.skill3.effect").withStyle(net.minecraft.ChatFormatting.GRAY));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.anchor").withStyle(net.minecraft.ChatFormatting.GRAY));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.wear").withStyle(net.minecraft.ChatFormatting.GRAY));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.music").withStyle(net.minecraft.ChatFormatting.GRAY));
-    e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.place").withStyle(net.minecraft.ChatFormatting.GRAY));
+    for(String key:DollTooltip.KEYS)e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll."+key).withStyle(net.minecraft.ChatFormatting.GRAY));
    }else e.getToolTip().add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.shift").withStyle(net.minecraft.network.chat.Style.EMPTY.withColor(0x999999)));
   }
 

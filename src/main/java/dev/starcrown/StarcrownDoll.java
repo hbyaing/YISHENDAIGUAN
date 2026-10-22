@@ -27,13 +27,13 @@ public class StarcrownDoll {
  public static final RegistryObject<Block> YULE_DOLL=BLOCKS.register("yule_doll",()->new DollBlock());
  public static final RegistryObject<Item> YULE_ITEM=ITEMS.register("yule_doll",()->new WearableDoll(YULE_DOLL.get()));
  public static final RegistryObject<Item> WHITE_RICE=ITEMS.register("white_rice",WhiteRiceItem::new);
- public static boolean isDoll(ItemStack stack){return stack.is(ITEM.get())||stack.is(YULE_ITEM.get());}
+ public static boolean isDoll(ItemStack stack){return DollAuthority.doll(stack);}
  public static BlockState dollState(ItemStack stack){return (stack.is(YULE_ITEM.get())?YULE_DOLL:DOLL).get().defaultBlockState();}
  public static final RegistryObject<CreativeModeTab> TAB=TABS.register("yishen_daiguan",()->CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.starcrowndoll")).icon(()->new ItemStack(ITEM.get())).displayItems((parameters,output)->{output.accept(ITEM.get());output.accept(YULE_ITEM.get());output.accept(WHITE_RICE.get());}).build());
  public static final RegistryObject<BlockEntityType<DollEntity>> TYPE=TYPES.register("doll",()->BlockEntityType.Builder.of(DollEntity::new,DOLL.get(),YULE_DOLL.get()).build(null));
  static final DeferredRegister<net.minecraft.core.particles.ParticleType<?>> PARTICLES=DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES,ID);
  public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> STAR=PARTICLES.register("star",()->new net.minecraft.core.particles.SimpleParticleType(false));
- public StarcrownDoll(){IEventBus bus=FMLJavaModLoadingContext.get().getModEventBus();TABS.register(bus);SOUNDS.register(bus);PARTICLES.register(bus);BLOCKS.register(bus);ITEMS.register(bus);TYPES.register(bus);}
+ public StarcrownDoll(){SevenNetwork.init();IEventBus bus=FMLJavaModLoadingContext.get().getModEventBus();TABS.register(bus);SOUNDS.register(bus);PARTICLES.register(bus);BLOCKS.register(bus);ITEMS.register(bus);TYPES.register(bus);DivineEffects.EFFECTS.register(bus);}
  public static class WearableDoll extends BlockItem {
   @Override public void appendHoverText(ItemStack stack,Level level,java.util.List<net.minecraft.network.chat.Component> lines,TooltipFlag flag){super.appendHoverText(stack,level,lines,flag);lines.add(net.minecraft.network.chat.Component.translatable(stack.is(YULE_ITEM.get())?"tooltip.starcrowndoll.yule.divinity":"tooltip.starcrowndoll.divinity").withStyle(net.minecraft.ChatFormatting.LIGHT_PURPLE));if(!stack.is(YULE_ITEM.get()))lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.lore").withStyle(net.minecraft.ChatFormatting.WHITE));}
   @Override public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> c){c.accept(new net.minecraftforge.client.extensions.common.IClientItemExtensions(){public net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer getCustomRenderer(){return DollItemRenderer.instance();}});}

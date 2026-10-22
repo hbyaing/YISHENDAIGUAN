@@ -5,6 +5,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.event.TickEvent;
 @Mod("starcrownqa")
 public class CombatQa {
+ public static final net.minecraftforge.registries.DeferredRegister<net.minecraft.world.effect.MobEffect> EFFECTS=net.minecraftforge.registries.DeferredRegister.create(net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS,"starcrownqa");
+ public static final net.minecraftforge.registries.RegistryObject<net.minecraft.world.effect.MobEffect> FUTURE=EFFECTS.register("future_benefit",()->new Probe());
+ private static class Probe extends net.minecraft.world.effect.MobEffect { Probe(){super(net.minecraft.world.effect.MobEffectCategory.BENEFICIAL,0xaaddff);} }
+ public CombatQa(){EFFECTS.register(net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext.get().getModEventBus());}
+
  static java.util.UUID liveId;static int liveTicks;
  static java.lang.reflect.Field healthField()throws Exception{for(String name:new String[]{"DATA_HEALTH_ID","f_20961_"})try{var f=net.minecraft.world.entity.LivingEntity.class.getDeclaredField(name);f.setAccessible(true);return f;}catch(NoSuchFieldException ignored){}throw new NoSuchFieldException("Health");}
  static void require(boolean ok,String name,java.util.List<String> out){if(!ok)throw new AssertionError(name);out.add("PASS "+name);}

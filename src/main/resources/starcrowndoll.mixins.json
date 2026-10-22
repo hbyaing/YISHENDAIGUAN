@@ -39,9 +39,22 @@
     "ArcaneGuard22",
     "ArcaneGuard23",
     "ArcaneWeaponGuard",
-    "VitalDataGuard"
+    "VitalDataGuard",
+    "HumilityLiving",
+    "HumilityPlayerDamage",
+    "HumilityTargeting",
+    "HumilityNearestPlayer",
+    "HumilitySensing",
+    "HumilityBrain",
+    "HumilityShrieker",
+    "HumilityDragon",
+    "HumilityWither",
+    "CreativeUnequip"
   ],
   "injectors": {
     "defaultRequire": 0
-  }
+  },
+  "client": [
+    "HumilityPlayerRenderer"
+  ]
 }

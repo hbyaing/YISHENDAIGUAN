@@ -3,3 +3,23 @@ sourceSets { qaMod { java.srcDir 'tools/qa/runtime/java'; resources.srcDir 'tool
 tasks.register('qaJar', Jar) { archiveBaseName='YiShenCombatQA'; archiveClassifier='test'; from sourceSets.qaMod.output }
 reobf { qaJar {} }
 tasks.named('qaJar').configure { finalizedBy 'reobfQaJar' }
+
+minecraft.runs {
+ gameTestServer {
+  workingDirectory project.file('../work/humility-gametest')
+  property 'forge.enabledGameTestNamespaces', 'starcrownqa'
+  args '--mixin', 'starcrowndoll.mixins.json'
+  mods {
+   starcrowndoll { source sourceSets.main }
+   starcrownqa { source sourceSets.qaMod }
+  }
+ }
+}
+
+if (project.hasProperty('sevenVisual')) {
+ minecraft.runs.client {
+  workingDirectory project.file('../work/seven-client')
+  args '--username', 'SevenQA', '--width', '1280', '--height', '900'
+  mods { starcrownqa { source sourceSets.qaMod } }
+ }
+}

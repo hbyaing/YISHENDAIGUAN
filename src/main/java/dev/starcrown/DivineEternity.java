@@ -10,7 +10,7 @@ public final class DivineEternity {
  public static boolean sealed(Mob mob){
   if(!(mob.level() instanceof ServerLevel level)||!mob.isAlive())return false;
   if(DollDance.controlled(mob))return true;
-  for(var p:level.players())if(DivineWill.wearing(p)&&Math.abs(p.getX()-mob.getX())<=3.5&&Math.abs(p.getY()-mob.getY())<=3.5&&Math.abs(p.getZ()-mob.getZ())<=3.5)return true;
+  for(var p:level.players())if(DivineWill.wearing(p)&&p.distanceToSqr(mob)<=144&&!DivineSeven.ally(p,mob))return true;
   return false;
  }
  public static void stop(Mob mob){
@@ -21,6 +21,6 @@ public final class DivineEternity {
  @SubscribeEvent public static void tick(TickEvent.LevelTickEvent e){
   if(e.phase!=TickEvent.Phase.START||!(e.level instanceof ServerLevel level))return;
   var seen=java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<Mob,Boolean>());
-  for(var p:level.players())if(DivineWill.wearing(p))for(var mob:level.getEntitiesOfClass(Mob.class,new net.minecraft.world.phys.AABB(p.position(),p.position()).inflate(3.5)))if(seen.add(mob)&&sealed(mob))stop(mob);
+  for(var p:level.players())if(DivineWill.wearing(p))for(var mob:level.getEntitiesOfClass(Mob.class,new net.minecraft.world.phys.AABB(p.position(),p.position()).inflate(12)))if(seen.add(mob)&&sealed(mob))stop(mob);
  }
 }
