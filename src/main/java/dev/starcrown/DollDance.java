@@ -1,0 +1,68 @@
+package dev.starcrown;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import java.util.*;
+
+/** Per-level live sources. No persistent AI flags or goal definitions are modified. */
+@Mod.EventBusSubscriber(modid=StarcrownDoll.ID)
+public final class DollDance {
+ private static final Map<Level,Set<BlockPos>> SOURCES=Collections.synchronizedMap(new WeakHashMap<>());
+ private static final Map<Mob,Vec3> LOCKS=new WeakHashMap<>();
+ public static void sourceChanged(StarcrownDoll.DollEntity doll){
+  Level level=doll.getLevel();if(level==null)return;
+  Set<BlockPos> sources=SOURCES.computeIfAbsent(level,l->new HashSet<>());
+  if(doll.isPlaying()&&!doll.isRemoved())sources.add(doll.getBlockPos().immutable());else sources.remove(doll.getBlockPos());
+ }
+ public static boolean controlled(Mob mob){return mob.isAlive()&&nearSource(mob.level(),mob.level().isClientSide?mob.position():LOCKS.getOrDefault(mob,mob.position()));}
+ public static boolean nearSource(Level level,Vec3 point){
+  return nearSource(level,point,false);
+ }
+ public static boolean nearYule(Level level,Vec3 point){return nearSource(level,point,true);}
+ public static Set<net.minecraft.world.entity.LivingEntity> feastTargets(Level level){
+  Set<net.minecraft.world.entity.LivingEntity> result=new HashSet<>();
+  for(BlockPos pos:List.copyOf(SOURCES.getOrDefault(level,Set.of())))if(level.hasChunkAt(pos)&&level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll&&doll.isPlaying()&&!doll.isRemoved()&&doll.getBlockState().is(StarcrownDoll.YULE_DOLL.get()))
+   result.addAll(level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,new AABB(pos).inflate(16),e->e.isAlive()&&!e.isSpectator()&&e.position().distanceToSqr(Vec3.atCenterOf(pos))<=256));
+  return result;
+ }
+ private static boolean nearSource(Level level,Vec3 point,boolean yuleOnly){
+  for(BlockPos pos:List.copyOf(SOURCES.getOrDefault(level,Set.of()))) {
+   if(!level.hasChunkAt(pos))continue;
+   if(level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll&&!doll.isRemoved()&&doll.isPlaying()&&(!yuleOnly||doll.getBlockState().is(StarcrownDoll.YULE_DOLL.get()))&&point.distanceToSqr(Vec3.atCenterOf(pos))<=256)return true;
+  }
+  return false;
+ }
+ private static void hold(Mob mob){
+  Vec3 anchor=LOCKS.computeIfAbsent(mob,m->m.position());
+  DivineEternity.stop(mob);mob.setDeltaMovement(Vec3.ZERO);mob.fallDistance=0;
+  if(mob.position().distanceToSqr(anchor)>1.0e-10)mob.setPos(anchor.x,anchor.y,anchor.z);
+ }
+ public static void refresh(Level level){
+  if(level.isClientSide)return;
+  LOCKS.entrySet().removeIf(e->e.getKey().level()==level&&(!e.getKey().isAlive()||!controlled(e.getKey())));
+ }
+ @SubscribeEvent(priority=EventPriority.HIGHEST)
+ public static void livingTick(LivingEvent.LivingTickEvent event){
+  if(event.getEntity() instanceof Mob mob&&controlled(mob)){
+   if(!mob.level().isClientSide)hold(mob);else mob.setDeltaMovement(Vec3.ZERO);
+   event.setCanceled(true);
+  }
+ }
+ @SubscribeEvent public static void levelTick(TickEvent.LevelTickEvent event){
+  Level level=event.level;if(level.isClientSide)return;
+  refresh(level);
+  for(BlockPos pos:List.copyOf(SOURCES.getOrDefault(level,Set.of()))){
+   if(!level.hasChunkAt(pos))continue;
+   if(!(level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll)||doll.isRemoved()||!doll.isPlaying()){SOURCES.get(level).remove(pos);continue;}
+   for(Mob mob:level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(16)))if(controlled(mob))hold(mob);
+  }
+ }
+}

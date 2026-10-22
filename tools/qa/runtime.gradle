@@ -1,0 +1,5 @@
+
+sourceSets { qaMod { java.srcDir 'tools/qa/runtime/java'; resources.srcDir 'tools/qa/runtime/resources'; compileClasspath += sourceSets.main.output + sourceSets.main.compileClasspath; runtimeClasspath += output + compileClasspath } }
+tasks.register('qaJar', Jar) { archiveBaseName='YiShenCombatQA'; archiveClassifier='test'; from sourceSets.qaMod.output }
+reobf { qaJar {} }
+tasks.named('qaJar').configure { finalizedBy 'reobfQaJar' }

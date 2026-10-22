@@ -1,0 +1,18 @@
+plugins { id 'java'; id 'net.minecraftforge.gradle' version '[6.0,6.2)' }
+version='1.12.0'
+group='dev.starcrown'
+base { archivesName='YiShenDaiGuan-1.20.1' }
+java.toolchain.languageVersion=JavaLanguageVersion.of(17)
+minecraft { mappings channel:'official',version:'1.20.1'; runs { client { workingDirectory project.file('run'); property 'mixin.env.remapRefMap', 'true'; property 'mixin.env.refMapRemappingFile', project.file('build/createSrgToMcp/output.srg').absolutePath; args '--mixin', 'starcrowndoll.mixins.json';  mods { starcrowndoll { source sourceSets.main } } } } }
+dependencies { minecraft 'net.minecraftforge:forge:1.20.1-47.4.0' }
+tasks.withType(JavaCompile).configureEach { options.encoding='UTF-8' }
+jar.finalizedBy('reobfJar')
+
+// Never package local acceptance harness classes.
+jar { exclude "dev/starcrown/Qa*" }
+
+jar { manifest { attributes(["MixinConfigs":"starcrowndoll.mixins.json"]) } }
+tasks.withType(JavaCompile).configureEach { options.compilerArgs += ["-proc:none"] }
+
+minecraft.runs { server { workingDirectory project.file('run-server'); args '--mixin', 'starcrowndoll.mixins.json', '--nogui'; mods { starcrowndoll { source sourceSets.main } } } }
+

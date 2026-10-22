@@ -1,0 +1,20 @@
+{
+  "doll_music": {
+    "subtitle": "subtitles.starcrowndoll.doll_music",
+    "sounds": [
+      {
+        "name": "starcrowndoll:doll_music",
+        "stream": true
+      }
+    ]
+  },
+  "yule_music": {
+    "subtitle": "subtitles.starcrowndoll.yule_music",
+    "sounds": [
+      {
+        "name": "starcrowndoll:yule_music",
+        "stream": true
+      }
+    ]
+  }
+}

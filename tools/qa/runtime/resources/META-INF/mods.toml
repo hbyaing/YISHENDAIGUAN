@@ -1,0 +1,7 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="All Rights Reserved"
+[[mods]]
+modId="starcrownqa"
+version="1.0"
+displayName="Isolated acceptance harness"

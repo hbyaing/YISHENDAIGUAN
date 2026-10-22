@@ -1,0 +1,18 @@
+package dev.starcrown.mixin;
+import dev.starcrown.DivineProtection;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.damagesource.DamageSource;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.*;
+import org.spongepowered.asm.mixin.injection.callback.*;
+@Mixin(net.minecraft.world.entity.player.Player.class)
+public abstract class PlayerGuard {
+ @Inject(method={"attack(Lnet/minecraft/world/entity/Entity;)V","m_5706_(Lnet/minecraft/world/entity/Entity;)V"},at=@At("HEAD"),cancellable=true,remap=false,require=0)
+ private void divineAttack(Entity target,CallbackInfo ci){if(dev.starcrown.DivineCombat.reject(target,"Player.attack"))ci.cancel();}
+
+ @Inject(method={"setItemSlot(Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)V","m_8061_(Lnet/minecraft/world/entity/EquipmentSlot;Lnet/minecraft/world/item/ItemStack;)V"},at=@At("HEAD"),cancellable=true,remap=false,require=0)
+ private void divineHead(EquipmentSlot slot,net.minecraft.world.item.ItemStack stack,CallbackInfo ci){if(slot==EquipmentSlot.HEAD&&dev.starcrown.DivineAnchor.blockSlot((net.minecraft.world.entity.player.Player)(Object)this,39,stack))ci.cancel();}
+
+ @Inject(method={"die(Lnet/minecraft/world/damagesource/DamageSource;)V","m_6667_(Lnet/minecraft/world/damagesource/DamageSource;)V"},at=@At("HEAD"),cancellable=true,remap=false,require=0)
+ private void divineDeath(DamageSource source,CallbackInfo ci){if(DivineProtection.blockDeath((Entity)(Object)this,"PlayerGuard.die"))ci.cancel();}
+}
