@@ -27,7 +27,7 @@ public abstract class LivingGuard {
  private void divineRemove(Entity.RemovalReason reason,CallbackInfo ci){if(DivineProtection.blockRemoval((Entity)(Object)this,reason,"LivingEntity.remove"))ci.cancel();}
 
  @Inject(method={"addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z","m_147207_(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z"},at=@At("HEAD"),cancellable=true,remap=false,require=1)
- private void divineDebuff(net.minecraft.world.effect.MobEffectInstance effect,Entity source,CallbackInfoReturnable<Boolean> cir){if(DivineProtection.active((Entity)(Object)this)&&dev.starcrown.DivineWill.unwanted(effect))cir.setReturnValue(false);}
+ private void divineDebuff(net.minecraft.world.effect.MobEffectInstance effect,Entity source,CallbackInfoReturnable<Boolean> cir){if((DivineProtection.active((Entity)(Object)this)&&dev.starcrown.DivineWill.unwanted(effect))||(dev.starcrown.YuleChastity.active((Entity)(Object)this)&&dev.starcrown.YuleChastity.unwanted(effect)))cir.setReturnValue(false);}
  @Inject(method={"forceAddEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)V","m_147215_(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)V"},at=@At("HEAD"),cancellable=true,remap=false,require=1)
- private void divineForcedDebuff(net.minecraft.world.effect.MobEffectInstance effect,Entity source,CallbackInfo ci){if(DivineProtection.active((Entity)(Object)this)&&dev.starcrown.DivineWill.unwanted(effect))ci.cancel();}
+ private void divineForcedDebuff(net.minecraft.world.effect.MobEffectInstance effect,Entity source,CallbackInfo ci){if((DivineProtection.active((Entity)(Object)this)&&dev.starcrown.DivineWill.unwanted(effect))||(dev.starcrown.YuleChastity.active((Entity)(Object)this)&&dev.starcrown.YuleChastity.unwanted(effect)))ci.cancel();}
 }

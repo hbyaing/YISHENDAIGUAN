@@ -27,9 +27,10 @@ public class StarcrownDoll {
  public static final RegistryObject<Block> YULE_DOLL=BLOCKS.register("yule_doll",()->new DollBlock());
  public static final RegistryObject<Item> YULE_ITEM=ITEMS.register("yule_doll",()->new WearableDoll(YULE_DOLL.get()));
  public static final RegistryObject<Item> WHITE_RICE=ITEMS.register("white_rice",WhiteRiceItem::new);
+ public static final RegistryObject<Item> FISHING_GOD_FISH=ITEMS.register("fishing_god_fish",()->new Item(new Item.Properties()));
  public static boolean isDoll(ItemStack stack){return DollAuthority.doll(stack);}
  public static BlockState dollState(ItemStack stack){return (stack.is(YULE_ITEM.get())?YULE_DOLL:DOLL).get().defaultBlockState();}
- public static final RegistryObject<CreativeModeTab> TAB=TABS.register("yishen_daiguan",()->CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.starcrowndoll")).icon(()->new ItemStack(ITEM.get())).displayItems((parameters,output)->{output.accept(ITEM.get());output.accept(YULE_ITEM.get());output.accept(WHITE_RICE.get());}).build());
+ public static final RegistryObject<CreativeModeTab> TAB=TABS.register("yishen_daiguan",()->CreativeModeTab.builder().title(net.minecraft.network.chat.Component.translatable("itemGroup.starcrowndoll")).icon(()->new ItemStack(ITEM.get())).displayItems((parameters,output)->{output.accept(ITEM.get());output.accept(YULE_ITEM.get());output.accept(WHITE_RICE.get());output.accept(FISHING_GOD_FISH.get());}).build());
  public static final RegistryObject<BlockEntityType<DollEntity>> TYPE=TYPES.register("doll",()->BlockEntityType.Builder.of(DollEntity::new,DOLL.get(),YULE_DOLL.get()).build(null));
  static final DeferredRegister<net.minecraft.core.particles.ParticleType<?>> PARTICLES=DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES,ID);
  public static final RegistryObject<net.minecraft.core.particles.SimpleParticleType> STAR=PARTICLES.register("star",()->new net.minecraft.core.particles.SimpleParticleType(false));

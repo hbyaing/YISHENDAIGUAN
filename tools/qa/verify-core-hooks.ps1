@@ -5,8 +5,26 @@ param(
 $ErrorActionPreference='Stop'
 $projectRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../..'))
 $targets=@{
+ 'DiligenceSleep'='net.minecraft.server.level.ServerPlayer'
+ 'CharityItem'='net.minecraft.world.entity.item.ItemEntity'
+ 'CharityInventory'='net.minecraft.world.entity.player.Inventory'
+ 'CharitySlot'='net.minecraft.world.inventory.Slot'
+ 'CharityOrb'='net.minecraft.world.entity.ExperienceOrb'
+ 'TemperanceStack'='net.minecraft.world.item.ItemStack'
+ 'TemperancePlayer'='net.minecraft.world.entity.player.Player'
+ 'TemperanceFood'='net.minecraft.world.food.FoodData'
+ 'TemperanceSlot'='net.minecraft.world.inventory.Slot'
+ 'TemperanceMining'='net.minecraft.server.level.ServerPlayerGameMode'
  'CreativeUnequip'='net.minecraft.server.network.ServerGamePacketListenerImpl'
  'InventoryAnchor'='net.minecraft.world.entity.player.Inventory'
+ 'ChastityPlayer'='net.minecraft.world.entity.player.Player'
+ 'ChastityAnimal'='net.minecraft.world.entity.animal.Animal'
+ 'ChastityPet'='net.minecraft.world.entity.TamableAnimal'
+ 'ChastityHorse'='net.minecraft.world.entity.animal.horse.AbstractHorse'
+ 'ChastityPotion'='net.minecraft.world.item.PotionItem'
+ 'ChastityTradeSlot'='net.minecraft.world.inventory.Slot'
+ 'ChastityTrade'='net.minecraft.world.inventory.MerchantMenu'
+ 'ChastityUse'='net.minecraft.world.entity.LivingEntity'
  'LivingGuard'='net.minecraft.world.entity.LivingEntity'
  'PlayerGuard'='net.minecraft.world.entity.player.Player'
  'ServerPlayerGuard'='net.minecraft.server.level.ServerPlayer'
@@ -49,5 +67,5 @@ foreach($mixin in $targets.Keys){
  }
  }
 }
-if($checked -ne 41){throw "Expected 41 required hook groups, inspected $checked"}
+if($checked -ne 76){throw "Expected 76 required hook groups, inspected $checked"}
 Write-Output "PASS: $checked required hooks match declared method descriptors in $MinecraftJar"

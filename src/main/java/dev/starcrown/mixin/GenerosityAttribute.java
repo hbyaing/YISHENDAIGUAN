@@ -7,5 +7,5 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 @Mixin(AttributeInstance.class)
 public abstract class GenerosityAttribute {
  @Inject(method={"getValue()D","m_22135_()D"},at=@At("RETURN"),cancellable=true,remap=false,require=1)
- private void doubled(CallbackInfoReturnable<Double> ci){if(YuleGenerosity.boosted((AttributeInstance)(Object)this)){double value=ci.getReturnValue();if(Double.isFinite(value))ci.setReturnValue(Math.max(-Double.MAX_VALUE,Math.min(Double.MAX_VALUE,value*2)));}}
+ private void doubled(CallbackInfoReturnable<Double> ci){var a=(AttributeInstance)(Object)this;double value=dev.starcrown.YuleDiligence.attributeValue(a,ci.getReturnValue());if(YuleGenerosity.boosted(a)&&Double.isFinite(value))value=Math.max(-Double.MAX_VALUE,Math.min(Double.MAX_VALUE,value*2));ci.setReturnValue(value);}
 }

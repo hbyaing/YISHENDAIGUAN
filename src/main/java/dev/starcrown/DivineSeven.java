@@ -21,6 +21,8 @@ import net.minecraftforge.fml.common.Mod;
 public final class DivineSeven {
  public static final String ROOT="starcrown_seven",MARK="starcrown_verdict";
  public static CompoundTag settings(Player p){if(!p.getPersistentData().contains(ROOT))p.getPersistentData().put(ROOT,new CompoundTag());return p.getPersistentData().getCompound(ROOT);}
+ public static int miningIndex(Player p){return Math.max(0,Math.min(3,settings(p).getInt("mining_range")));}
+ public static int miningRadius(Player p){return miningIndex(p)+1;}
  public static double speed(Player p){return new double[]{1,1.5,2,3,5}[Math.max(0,Math.min(4,settings(p).contains("speed")?settings(p).getInt("speed"):1))];}
  public static void release(ServerPlayer p){var data=settings(p);data.putBoolean("domain",false);data.putBoolean("restoring",false);data.remove("last_position");}
  public static boolean ally(ServerPlayer p,LivingEntity e){return e==p||p.isAlliedTo(e)||(e instanceof TamableAnimal a&&p.getUUID().equals(a.getOwnerUUID()))||(e instanceof net.minecraft.world.entity.animal.horse.AbstractHorse a&&p.getUUID().equals(a.getOwnerUUID()))||settings(p).getCompound("friends").contains(e.getUUID().toString());}
@@ -68,7 +70,7 @@ public final class DivineSeven {
  public static void action(ServerPlayer p,int action,int value){if(!DivineWill.wearing(p))return;var data=settings(p);String message="";switch(action){
   case 0 -> {data.putBoolean("domain",!data.getBoolean("domain"));message="万象领域："+(data.getBoolean("domain")?"开启":"关闭");}
   case 1 -> {data.putInt("speed",Math.max(0,Math.min(4,value)));DivineWill.update(p,true);message="移动速度 ×"+speed(p);}
-  case 2 -> {data.putBoolean("night_off",!data.getBoolean("night_off"));if(data.getBoolean("night_off"))p.removeEffect(MobEffects.NIGHT_VISION);message="夜视："+(!data.getBoolean("night_off")?"开启":"关闭");}
+  case 2 -> {PotionFilter.set(p,net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getKey(net.minecraft.world.effect.MobEffects.NIGHT_VISION),!PotionFilter.enabled(p,net.minecraft.world.effect.MobEffects.NIGHT_VISION));message="夜视："+(PotionFilter.enabled(p,net.minecraft.world.effect.MobEffects.NIGHT_VISION)?"开启":"关闭");}
   case 3 -> {data.putBoolean("area_mine",!data.getBoolean("area_mine"));message="范围采掘："+(data.getBoolean("area_mine")?"开启":"关闭");}
   case 4 -> {message=DivineTravel.blink(p)?"群星已为你开路":"没有找到已加载的安全落点";}
   case 5 -> {message=DivineTravel.save(p,Math.max(0,Math.min(7,value)))?"神性锚点已记录":"当前位置不安全";}
@@ -81,6 +83,7 @@ public final class DivineSeven {
   case 12 -> {var target=aimed(p);if(target!=null){var friends=data.getCompound("friends");String key=target.getUUID().toString();if(friends.contains(key)){friends.remove(key);message="已移出庇护名单";}else{friends.putBoolean(key,true);message="已加入庇护名单";}data.put("friends",friends);}else message="请瞄准64格内的生物或玩家";}
   case 13 -> {var target=aimed(p);if(target!=null&&owner(target)==p){target.setHealth(target.getPersistentData().getCompound(MARK).getFloat("minimum"));message="岁月已兑现战果";}else message="请瞄准已记录的敌人";}
   case 14 -> {return;}
+  case 18 -> {data.putInt("mining_range",Math.max(0,Math.min(3,value)));int size=miningRadius(p)*2+1;message="采掘范围："+size+"×"+size+"×"+size;}
   case 17 -> {var escrow=p.getPersistentData().getList("starcrown_confiscated_dolls",net.minecraft.nbt.Tag.TAG_COMPOUND);int count=0;for(int i=0;i<escrow.size();){var item=net.minecraft.world.item.ItemStack.of(escrow.getCompound(i).getCompound("item"));if(item.isEmpty()){escrow.remove(i);continue;}if(!p.getInventory().add(item)){escrow.getCompound(i).put("item",item.save(new net.minecraft.nbt.CompoundTag()));break;}escrow.remove(i);count++;}p.getPersistentData().put("starcrown_confiscated_dolls",escrow);message="已领取 "+count+" 个被没收的玩偶";}
   case 15 -> {int count=0;for(var target:p.serverLevel().getEntitiesOfClass(Mob.class,p.getBoundingBox().inflate(64)))if(p.distanceToSqr(target)<=4096&&hostile(p,target)){var direction=target.position().subtract(p.position());if(direction.lengthSqr()<.01)direction=new Vec3(1,0,0);var destination=p.position().add(direction.normalize().scale(68));if(DivineTravel.safe(target,p.serverLevel(),destination)){target.moveTo(destination.x,destination.y,destination.z);count++;}}message="已驱逐 "+count+" 个敌人";}
   default -> {return;}

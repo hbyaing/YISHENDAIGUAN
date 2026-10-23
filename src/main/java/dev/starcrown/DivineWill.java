@@ -17,7 +17,7 @@ public final class DivineWill {
  static final String LEASE="starcrowndoll_will_lease";
  static final UUID SPEED=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3021"),BLOCK=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3022"),ENTITY=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3023"),KNOCK=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3024");
  public static boolean wearing(Player p){return !p.isSpectator()&&(p.getItemBySlot(EquipmentSlot.HEAD).is(StarcrownDoll.ITEM.get())||(p instanceof ServerPlayer sp&&DivineAnchor.locked(sp)));}
- public static boolean automaticBenefit(MobEffect effect){return effect.getCategory()==MobEffectCategory.BENEFICIAL;}
+ public static boolean automaticBenefit(MobEffect effect){return effect.getCategory()==MobEffectCategory.BENEFICIAL&&effect!=MobEffects.INVISIBILITY;}
  public static boolean unwanted(MobEffectInstance effect){return effect!=null&&effect.getEffect().getCategory()!=MobEffectCategory.BENEFICIAL;}
  static void modifier(ServerPlayer p,Attribute attribute,UUID id,double value,AttributeModifier.Operation op,boolean enable){var a=p.getAttribute(attribute);if(a==null)return;if(enable){if(a.getModifier(id)!=null&&a.getModifier(id).getAmount()!=value)a.removeModifier(id);if(a.getModifier(id)==null)a.addTransientModifier(new AttributeModifier(id,"starcrowndoll_will",value,op));}else a.removeModifier(id);}
  static boolean ownVision(MobEffectInstance e){return e!=null&&e.getAmplifier()==0&&e.isAmbient()&&!e.isVisible()&&!e.showIcon()&&!e.isInfiniteDuration()&&e.getDuration()<=400;}
@@ -25,6 +25,10 @@ public final class DivineWill {
  private static void benefits(ServerPlayer p,boolean enabled){
   var lease=p.getPersistentData().getCompound(LEASE);var saved=lease.getCompound("benefits");long now=p.serverLevel().getGameTime();
   for(var effect:net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS){if(effect.getCategory()!=MobEffectCategory.BENEFICIAL||effect==MobEffects.NIGHT_VISION)continue;String key=net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();var current=p.getEffect(effect);
+   if(enabled&&(!automaticBenefit(effect)||!PotionFilter.enabled(p,effect))){
+    if(saved.contains(key)){if(current!=null&&current.getAmplifier()==0&&current.isAmbient()&&!current.isVisible()&&!current.showIcon()&&current.getDuration()<=240){p.removeEffect(effect);var back=saved.getCompound(key);if(back.contains("effect")){var old=MobEffectInstance.load(elapsedEffect(back.getCompound("effect"),now-back.getLong("tick")));if(old!=null&&(old.isInfiniteDuration()||old.getDuration()>0))p.addEffect(old);}}saved.remove(key);}
+    continue;
+   }
    if(enabled){if(current!=null&&(current.isInfiniteDuration()||current.getAmplifier()>0||current.getDuration()>240))continue;
     if(!saved.contains(key)){var backup=new CompoundTag();backup.putLong("tick",now);if(current!=null)backup.put("effect",current.save(new CompoundTag()));saved.put(key,backup);}
     p.addEffect(new MobEffectInstance(effect,240,0,true,false,false));
@@ -36,16 +40,20 @@ public final class DivineWill {
   if(enable){
    if(!data.contains(LEASE)){var tag=new CompoundTag();tag.putBoolean("mayfly_before",p.getAbilities().mayfly);tag.putFloat("flight_before",p.getAbilities().getFlyingSpeed());data.put(LEASE,tag);}
    var tag=data.getCompound(LEASE);
-   if(!p.getAbilities().mayfly){p.getAbilities().mayfly=true;p.onUpdateAbilities();}
-   float flight=(float)(.05*DivineSeven.speed(p));if(p.getAbilities().getFlyingSpeed()!=flight){p.getAbilities().setFlyingSpeed(flight);p.onUpdateAbilities();}
+   boolean changed=!p.getAbilities().mayfly;
+   p.getAbilities().mayfly=true;
+   float flight=(float)(.05*DivineSeven.speed(p));
+   if(p.getAbilities().getFlyingSpeed()!=flight){p.getAbilities().setFlyingSpeed(flight);changed=true;}
+   // Reconcile the client after login, game-mode changes or another mod's abilities packet.
+   if(changed||p.tickCount%20==0)p.onUpdateAbilities();
    var vision=p.getEffect(MobEffects.NIGHT_VISION);
-   if(!DivineSeven.settings(p).getBoolean("night_off")&&(vision==null||(!vision.isInfiniteDuration()&&vision.getAmplifier()==0&&vision.getDuration()<300))){
+   if(PotionFilter.enabled(p,MobEffects.NIGHT_VISION)&&(vision==null||(!vision.isInfiniteDuration()&&vision.getAmplifier()==0&&vision.getDuration()<300))){
     if(vision!=null&&(!tag.getBoolean("vision_owned")||!ownVision(vision))){tag.put("vision_before",vision.save(new CompoundTag()));tag.putLong("vision_snapshot_tick",now);}
     p.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,400,0,true,false,false));tag.putBoolean("vision_owned",true);
    }
    p.clearFire();p.setTicksFrozen(0);p.setAirSupply(p.getMaxAirSupply());p.getFoodData().setFoodLevel(20);p.getFoodData().setSaturation(20);
    if(p.tickCount%20==0)benefits(p,true);
-   for(var effect:new java.util.ArrayList<>(p.getActiveEffects()))if(unwanted(effect))p.removeEffect(effect.getEffect());
+   for(var effect:new java.util.ArrayList<>(p.getActiveEffects()))if(unwanted(effect)||!PotionFilter.enabled(p,effect.getEffect()))p.removeEffect(effect.getEffect());
   }else if(data.contains(LEASE)){
    var tag=data.getCompound(LEASE);if(tag.contains("flight_before")){p.getAbilities().setFlyingSpeed(tag.getFloat("flight_before"));p.onUpdateAbilities();}if(!p.isCreative()&&!p.isSpectator()&&!tag.getBoolean("mayfly_before")){p.getAbilities().mayfly=false;p.getAbilities().flying=false;p.onUpdateAbilities();}
    if(tag.getBoolean("vision_owned")&&ownVision(p.getEffect(MobEffects.NIGHT_VISION))){p.removeEffect(MobEffects.NIGHT_VISION);if(tag.contains("vision_before")){var original=MobEffectInstance.load(elapsedEffect(tag.getCompound("vision_before"),Math.max(0,now-tag.getLong("vision_snapshot_tick"))));if(original!=null&&(original.isInfiniteDuration()||original.getDuration()>0))p.addEffect(original);}}
@@ -60,7 +68,7 @@ public final class DivineWill {
  @SubscribeEvent public static void tick(TickEvent.PlayerTickEvent e){if(e.phase==TickEvent.Phase.END&&e.player instanceof ServerPlayer p)update(p,wearing(p));}
  @SubscribeEvent public static void logout(PlayerEvent.PlayerLoggedOutEvent e){if(e.getEntity() instanceof ServerPlayer p)update(p,false);}
  @SubscribeEvent public static void clone(PlayerEvent.Clone e){if(e.getOriginal().getPersistentData().contains(LEASE))e.getEntity().getPersistentData().put(LEASE,e.getOriginal().getPersistentData().getCompound(LEASE).copy());}
- @SubscribeEvent(priority=EventPriority.LOWEST) public static void applicable(MobEffectEvent.Applicable e){if(DivineProtection.active(e.getEntity())&&unwanted(e.getEffectInstance()))e.setResult(Event.Result.DENY);}
+ @SubscribeEvent(priority=EventPriority.LOWEST) public static void applicable(MobEffectEvent.Applicable e){if(DivineProtection.active(e.getEntity())&&(unwanted(e.getEffectInstance())||(e.getEntity() instanceof ServerPlayer p&&!PotionFilter.enabled(p,e.getEffectInstance().getEffect()))))e.setResult(Event.Result.DENY);}
  @SubscribeEvent(priority=EventPriority.LOWEST,receiveCanceled=true) public static void remove(MobEffectEvent.Remove e){if(DivineProtection.active(e.getEntity())&&unwanted(e.getEffectInstance()))e.setCanceled(false);}
  @SubscribeEvent(priority=EventPriority.LOWEST) public static void knockback(LivingKnockBackEvent e){if(DivineProtection.active(e.getEntity()))e.setCanceled(true);}
  @SubscribeEvent public static void mining(PlayerEvent.BreakSpeed e){if(wearing(e.getEntity()))e.setNewSpeed(e.getNewSpeed()*20*(e.getEntity().isEyeInFluid(net.minecraft.tags.FluidTags.WATER)&&!net.minecraft.world.item.enchantment.EnchantmentHelper.hasAquaAffinity(e.getEntity())?5:1)*(e.getEntity().getAbilities().flying&&!e.getEntity().onGround()?5:1));}

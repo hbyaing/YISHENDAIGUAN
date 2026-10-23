@@ -27,7 +27,7 @@
   "tooltip.starcrowndoll.yule.feast": "While music plays, living creatures and players within 16 blocks eat rice every 1.6 seconds, gaining Instant Health XXIX. Stops outside range or when music ends.",
   "tooltip.starcrowndoll.yule.virtues": "Seven Virtues",
   "tooltip.starcrowndoll.yule.humility.name": "Humility",
-  "tooltip.starcrowndoll.yule.humility": ": By practicing humility, you cannot equip armor or weapons above iron grade. Your body remains half a block tall, and each hit you deal is capped at 1 damage (half a heart). The world shelters those who bow: each hit you receive is also capped at 1, including void, explosions and instant-kill commands. Your presence is erased from hostile targeting and sculk vibration sensing, including Wither and Ender Dragon targeting.",
+  "tooltip.starcrowndoll.yule.humility": ": By practicing humility, you cannot equip armor or weapons above iron grade. Each hit you deal is capped at 1 damage (half a heart). The world shelters those who bow: each hit you receive is also capped at 1, including void, explosions and instant-kill commands. Your presence is erased from hostile targeting and sculk vibration sensing, including Wither and Ender Dragon targeting.",
   "tooltip.starcrowndoll.skill2.benefits": "Grants all registered beneficial effects, including invisibility and ghost forms. Forces the wearer skin to render without removing these effects, and hides flame visuals.",
   "tooltip.starcrowndoll.skill4": "Usurpers! Return your stolen authority",
   "tooltip.starcrowndoll.skill4.effect": "Attackers are marked. Suppress shields, healing and standard revival; your strikes add 25% max-health damage and execute after four verdicts. Excludes players.",
@@ -49,6 +49,15 @@
   "tooltip.starcrowndoll.yule.tolerance.name": "Tolerance",
   "tooltip.starcrowndoll.yule.tolerance": ": Your attack key is revoked. Direct and attributed indirect harm is prevented, including your TNT and lava. A 48-block horizontal peace field converts zombies into villagers and disarms/pacifies hostile creatures. Incoming attacks become 10 seconds of Regeneration X and Absorption X for both you and the attacker.",
   "tooltip.starcrowndoll.yule.generosity.name": "Generosity",
-  "tooltip.starcrowndoll.yule.generosity": ": Main storage is limited to the hotbar. Scatter 1–3 units each minute. Manual Q drops upgrade without multiplying quantity. With ProjectE, choose a random higher-EMC item, preferably within 4x unit value, otherwise the nearest higher tier. Unvalued items remain unchanged. A gift collected by another player or mob permanently grants both parties Hero of the Village X and doubles all attributes and effective limits once.",
-  "entity.starcrowndoll.generous_gift": "Gift of Generosity: %s"
+  "tooltip.starcrowndoll.yule.generosity": ": Main storage is limited to the hotbar. Scatter 1–3 units each minute. Manual Q drops upgrade without multiplying quantity. Drops randomly increase in value; retain the original when no suitable higher-value item exists. A gift collected by another player or mob permanently grants both parties Hero of the Village X and doubles all attributes and effective limits once.",
+  "entity.starcrowndoll.generous_gift": "Gift of Generosity: %s",
+  "tooltip.starcrowndoll.yule.chastity.name": "Chastity",
+  "tooltip.starcrowndoll.yule.chastity": ": You cannot breed animals, tame pets, drink potions or trade with villagers. You are immune to negative status effects, including modded curses. Surface water freezes beneath your steps with Frost Walker X (12-block radius), while lava turns into obsidian. Undead and Nether creatures within 5 blocks are instantly purified by holy light.",
+  "tooltip.starcrowndoll.yule.temperance.name": "Temperance",
+  "tooltip.starcrowndoll.yule.temperance": ": Food more nutritious than bread is forbidden. Each block type can be mined at most 10 times per chunk. Inventory stacks are limited to 16. Hunger and saturation stay full; held and worn equipment cannot break. Bows require no arrows; pearls, rockets and placed blocks are not consumed.",
+  "tooltip.starcrowndoll.yule.charity.name": "Charity",
+  "tooltip.starcrowndoll.yule.charity": ": Death loot and death experience cannot be collected. Each non-undead death within 16 blocks costs half your current health. Empty-hand right-click heals an injured creature fully and grants Resistance V for 60 seconds. Empty-hand right-click ordinary animals or villagers establishes a persistent pact: while worn and within 16 blocks, they offer their loot-table items or current trade results once per second.",
+  "tooltip.starcrowndoll.yule.diligence.name": "Diligence",
+  "tooltip.starcrowndoll.yule.diligence": ": Beds cannot skip the night or reset your spawn. Standing idle longer than 3 seconds inflicts Wither III, exempt from Chastity immunity. Moving, jumping or swinging grants Haste X and Speed III. Blocks, including obsidian and bedrock, break instantly, subject to Temperance quotas. Each block travelled on foot, successfully mined or placed grants 1000 XP, permanent +0.1 maximum health and +0.01 luck. Growth has no gameplay cap. Luck improves Charity gifts.",
+  "item.starcrowndoll.fishing_god_fish": "Fishing God's Fish"
 }

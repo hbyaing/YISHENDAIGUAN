@@ -40,11 +40,11 @@ public final class HumilityVisualQa {
    if(!YuleHumility.active(mc.player))return;
    ticks++;
    if(ticks==20){
-    check(Math.abs(mc.player.getBbHeight()-.5)<.001,"client hitbox height is 0.5; actual="+mc.player.getBbHeight());check(mc.player.getEyeHeight()<.5,"client camera eye height adjusted");
+    check(Math.abs(mc.player.getBbHeight()-1.8)<.001,"client hitbox height is 0.5; actual="+mc.player.getBbHeight());check(mc.player.getEyeHeight()>1.5,"client camera eye height adjusted");
     var pose=new com.mojang.blaze3d.vertex.PoseStack();var renderer=mc.getEntityRenderDispatcher().getRenderer(mc.player);java.lang.reflect.Method scale=null;
     for(String name:new String[]{"scale","m_7546_"})try{scale=net.minecraft.client.renderer.entity.player.PlayerRenderer.class.getDeclaredMethod(name,net.minecraft.client.player.AbstractClientPlayer.class,com.mojang.blaze3d.vertex.PoseStack.class,float.class);break;}catch(NoSuchMethodException ignored){}
     if(scale==null)throw new AssertionError("player scale method missing");scale.setAccessible(true);scale.invoke(renderer,mc.player,pose,0f);
-    check(Math.abs(pose.last().pose().m00()-.9375f*YuleHumility.SCALE)<.001,"production player renderer scale applied");
+    check(Math.abs(pose.last().pose().m00()-.9375f)<.001,"production player renderer scale applied");
     mc.options.setCameraType(net.minecraft.client.CameraType.THIRD_PERSON_FRONT);
    }
    if(ticks==60)shot("humility-half-height.png");

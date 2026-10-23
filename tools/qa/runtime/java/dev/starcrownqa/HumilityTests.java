@@ -36,7 +36,7 @@ public final class HumilityTests {
    p.kill();near(h,p.getHealth(),17,"kill becomes one-point strike");h.assertTrue(p.isAlive()&&!p.isRemoved(),"kill did not delete player");
    p.setHealth(0);near(h,p.getHealth(),16,"direct zero-health write capped");
    p.die(p.damageSources().genericKill());near(h,p.getHealth(),16,"forced die blocked while health remains");
-   var victim=h.spawn(EntityType.PIG,5,2,5);victim.hurt(p.damageSources().playerAttack(p),100);near(h,victim.getHealth(),victim.getMaxHealth()-1,"outgoing damage capped");
+   var victim=h.spawn(EntityType.PIG,5,2,5);victim.hurt(p.damageSources().playerAttack(p),100);near(h,victim.getHealth(),victim.getMaxHealth(),"tolerance prevents outgoing attack");near(h,YuleHumility.damage(victim,p.damageSources().playerAttack(p),100),1,"humility damage cap retained");
    p.setItemSlot(EquipmentSlot.HEAD,ItemStack.EMPTY);p.setHealth(20);p.invulnerableTime=0;p.hurt(p.damageSources().genericKill(),4);near(h,p.getHealth(),16,"unequip releases cap");
    h.succeed();
   }finally{cleanup(p);}
@@ -45,7 +45,8 @@ public final class HumilityTests {
  public static void sizeAndEquipment(GameTestHelper h){
   var p=wearer(h);
   try{
-   for(var pose:new Pose[]{Pose.STANDING,Pose.CROUCHING,Pose.SWIMMING}){p.setPose(pose);p.refreshDimensions();near(h,p.getBbHeight(),.5f,"half-block height "+pose);h.assertTrue(p.getEyeHeight()<.5,"eye height inside body");}
+   for(var pose:new Pose[]{Pose.STANDING,Pose.CROUCHING,Pose.SWIMMING}){p.setPose(pose);p.refreshDimensions();near(h,p.getBbHeight(),p.getDimensions(pose).height,"normal pose height "+pose);}
+   p.getPersistentData().putBoolean("starcrowndoll_humility_size",true);YuleHumility.updateSize(p);h.assertTrue(!p.getPersistentData().contains("starcrowndoll_humility_size"),"legacy size marker removed");
    h.assertTrue(!YuleHumility.forbidden(new ItemStack(Items.IRON_SWORD)),"iron sword allowed");
    h.assertTrue(!YuleHumility.forbidden(new ItemStack(Items.GOLDEN_HELMET)),"gold allowed");
    h.assertTrue(YuleHumility.forbidden(new ItemStack(Items.DIAMOND_SWORD)),"diamond sword denied");

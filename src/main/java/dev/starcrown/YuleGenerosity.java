@@ -63,7 +63,7 @@ public final class YuleGenerosity {
  }
  public static void hotbar(ServerPlayer p,ItemStack stack){
   for(int i=0;i<9&&!stack.isEmpty();i++){if(i==p.getInventory().selected&&YuleHumility.forbidden(stack))continue;var stored=p.getInventory().items.get(i);if(!stored.isEmpty()&&ItemStack.isSameItemSameTags(stored,stack)){int n=Math.min(stack.getCount(),stored.getMaxStackSize()-stored.getCount());if(n>0){stored.grow(n);stack.shrink(n);}}}
-  for(int i=0;i<9&&!stack.isEmpty();i++){if(i==p.getInventory().selected&&YuleHumility.forbidden(stack))continue;if(p.getInventory().items.get(i).isEmpty())p.getInventory().items.set(i,stack.split(Math.min(stack.getCount(),stack.getMaxStackSize())));}
+  for(int i=0;i<9&&!stack.isEmpty();i++){if(i==p.getInventory().selected&&YuleHumility.forbidden(stack))continue;if(p.getInventory().items.get(i).isEmpty())p.getInventory().items.set(i,stack.split(Math.min(stack.getCount(),YuleTemperance.active(p)?Math.min(16,stack.getMaxStackSize()):stack.getMaxStackSize())));}
  }
  public static void escrow(ServerPlayer p,ItemStack stack){if(stack.isEmpty())return;var list=p.getPersistentData().getList("starcrowndoll_pending_scatter",Tag.TAG_COMPOUND);list.add(stack.save(new CompoundTag()));p.getPersistentData().put("starcrowndoll_pending_scatter",list);}
  public static void redirect(ServerPlayer p,ItemStack incoming){var copy=incoming.copy();hotbar(p,copy);if(!copy.isEmpty()&&!throwAutomatic(p,copy))escrow(p,copy);}

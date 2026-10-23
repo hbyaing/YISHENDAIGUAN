@@ -23,7 +23,7 @@ import net.minecraftforge.fml.common.Mod;
 /** The equipped Yule doll is the authority; no permanent player attributes or AI flags are changed. */
 @Mod.EventBusSubscriber(modid=StarcrownDoll.ID)
 public final class YuleHumility {
- public static final float SCALE=0.5f/1.8f;
+
  public static final TagKey<Item> ALLOWED=TagKey.create(Registries.ITEM,new ResourceLocation(StarcrownDoll.ID,"humility_allowed_equipment"));
  public static final TagKey<Item> FORBIDDEN=TagKey.create(Registries.ITEM,new ResourceLocation(StarcrownDoll.ID,"humility_forbidden_equipment"));
  private static final String SIZE_STATE="starcrowndoll_humility_size";
@@ -32,7 +32,7 @@ public final class YuleHumility {
  public static float capped(float amount){return Float.isFinite(amount)?Math.min(1,Math.max(0,amount)):1;}
  public static float damage(LivingEntity victim,DamageSource source,float amount){return active(victim)||active(source.getEntity())?capped(amount):amount;}
  public static float healthWrite(LivingEntity entity,float next){
-  if(!active(entity))return next;
+  if(!active(entity)||YuleCharity.costWrite(entity))return next;
   float current=entity.getHealth();if(!Float.isFinite(current)||current<=0)return Float.isFinite(next)?next:0;
   return Float.isFinite(next)?Math.max(next,Math.max(0,current-1)):Math.max(0,current-1);
  }
@@ -99,12 +99,9 @@ public final class YuleHumility {
  @SubscribeEvent(priority=EventPriority.HIGHEST) public static void attack(AttackEntityEvent event){if(active(event.getEntity())&&forbidden(event.getEntity().getMainHandItem()))event.setCanceled(true);}
  @SubscribeEvent(priority=EventPriority.HIGHEST) public static void use(PlayerInteractEvent.RightClickItem event){if(active(event.getEntity())&&forbidden(event.getItemStack()))event.setCanceled(true);}
  @SubscribeEvent public static void equipment(LivingEquipmentChangeEvent event){if(event.getEntity() instanceof ServerPlayer p)enforceEquipment(p);}
- @SubscribeEvent(priority=EventPriority.LOWEST) public static void size(EntityEvent.Size event){if(active(event.getEntity())){event.setNewSize(EntityDimensions.scalable(.6f*SCALE,.5f),false);event.setNewEyeHeight(.425f);}}
  public static void updateSize(Player player){
-  boolean enabled=active(player);var data=player.getPersistentData();boolean previous=data.getBoolean(SIZE_STATE);
-  // Entity equality is ID-based; never share a player-keyed cache between integrated server and client.
-  if(previous!=enabled||(enabled&&Math.abs(player.getBbHeight()-.5f)>.001f))player.refreshDimensions();
-  if(enabled)data.putBoolean(SIZE_STATE,true);else if(previous)data.remove(SIZE_STATE);
+  var data=player.getPersistentData();
+  if(data.getBoolean(SIZE_STATE)){data.remove(SIZE_STATE);player.refreshDimensions();}
  }
  @SubscribeEvent public static void tick(TickEvent.PlayerTickEvent event){
   if(event.phase!=TickEvent.Phase.START)return;var player=event.player;updateSize(player);

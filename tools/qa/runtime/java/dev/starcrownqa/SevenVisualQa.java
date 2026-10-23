@@ -11,9 +11,13 @@ public final class SevenVisualQa {
  @SubscribeEvent public static void tick(TickEvent.ClientTickEvent e){if(e.phase!=TickEvent.Phase.END||!Files.exists(Path.of("enable-seven-visual-qa")))return;var mc=net.minecraft.client.Minecraft.getInstance();if(mc.getOverlay()!=null)return;ticks++;
   if(ticks==5)SevenClient.openPanel();
   if(ticks==30||ticks==75||ticks==95)net.minecraft.client.Screenshot.grab(mc.gameDirectory,"seven-"+ticks+".png",mc.getMainRenderTarget(),m->{});
-  if(ticks==40){var screen=mc.screen;try{var field=screen.getClass().getDeclaredField("page");field.setAccessible(true);field.setInt(screen,1);SevenClient.receive(new SevenNetwork.State(true,true,false,true,4));}catch(Exception ex){throw new RuntimeException(ex);}}
+  if(ticks==40){var screen=mc.screen;try{var field=screen.getClass().getDeclaredField("page");field.setAccessible(true);field.setInt(screen,1);SevenClient.receive(new SevenNetwork.State(true,true,true,true,4,3));}catch(Exception ex){throw new RuntimeException(ex);}}
   if(ticks==55)net.minecraft.client.Screenshot.grab(mc.gameDirectory,"seven-travel.png",mc.getMainRenderTarget(),m->{});
-  if(ticks==60)mc.setScreen(new Preview());
+  if(ticks==60){var screen=mc.screen;try{var field=screen.getClass().getDeclaredField("page");field.setAccessible(true);field.setInt(screen,3);screen.resize(mc,screen.width,screen.height);}catch(Exception ex){throw new RuntimeException(ex);}}
+  if(ticks==85){var screen=mc.screen;try{var field=screen.getClass().getDeclaredField("page");field.setAccessible(true);field.setInt(screen,4);screen.resize(mc,screen.width,screen.height);}catch(Exception ex){throw new RuntimeException(ex);}}
+  if(ticks==95)net.minecraft.client.Screenshot.grab(mc.gameDirectory,"seven-appearance.png",mc.getMainRenderTarget(),m->{});
+  if(ticks==100){var screen=mc.screen;try{var field=screen.getClass().getDeclaredField("page");field.setAccessible(true);field.setInt(screen,0);mc.options.guiScale().set(3);mc.resizeDisplay();}catch(Exception ex){throw new RuntimeException(ex);}}
+  if(ticks==108)net.minecraft.client.Screenshot.grab(mc.gameDirectory,"seven-small.png",mc.getMainRenderTarget(),m->{});
   if(ticks==110){try{Files.writeString(Path.of("seven-visual-results.txt"),"PASS divine panel pages and full seven-skill tooltip rendered\n");}catch(Exception ex){throw new RuntimeException(ex);}mc.stop();}
  }
  private static final class Preview extends net.minecraft.client.gui.screens.Screen {

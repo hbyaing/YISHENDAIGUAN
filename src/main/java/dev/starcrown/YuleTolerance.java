@@ -80,6 +80,7 @@ public final class YuleTolerance {
   if(e instanceof Projectile projectile&&harmless(projectile.getOwner()))e.getPersistentData().putBoolean(HARMLESS,true);
   if(e instanceof PrimedTnt tnt){UUID owner=YuleHazards.get(level).consumeTnt(tnt.blockPosition());if(owner!=null){e.getPersistentData().putBoolean(HARMLESS,true);e.getPersistentData().putUUID(OWNER,owner);}if(harmless(tnt.getOwner()))e.getPersistentData().putBoolean(HARMLESS,true);}
   if(e instanceof Mob mob){
+   if(YuleChastity.inside(mob))return;
    if(friendly(mob)){pacify(mob);return;}
    if(hostile(mob)&&inside(level,mob)){
     if(mob instanceof Zombie z&&!(mob instanceof ZombifiedPiglin)){var v=villager(z,level);if(v!=null){event.setCanceled(true);level.addFreshEntity(v);return;}}
@@ -94,8 +95,8 @@ public final class YuleTolerance {
  @SubscribeEvent(priority=EventPriority.LOWEST) public static void target(LivingChangeTargetEvent event){if(friendly(event.getEntity())||friendly(event.getNewTarget()))event.setNewTarget(null);}
  @SubscribeEvent(priority=EventPriority.LOWEST) public static void explosion(ExplosionEvent.Detonate event){var ex=event.getExplosion();if(harmless(ex.getDirectSourceEntity())||harmless(ex.getIndirectSourceEntity())){event.getAffectedEntities().clear();event.getAffectedBlocks().clear();ex.getHitPlayers().clear();}}
  @SubscribeEvent public static void placed(BlockEvent.EntityPlaceEvent event){if(event.getLevel() instanceof ServerLevel level&&active(event.getEntity())&&(!event.getPlacedBlock().is(Blocks.TNT)||level.getBlockState(event.getPos()).is(Blocks.TNT)))YuleHazards.get(level).claim(event.getPos(),event.getEntity().getUUID(),event.getPlacedBlock().is(Blocks.TNT));}
- @SubscribeEvent(priority=EventPriority.HIGHEST) public static void left(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event){if(active(event.getEntity()))event.setCanceled(true);}
- @SubscribeEvent(priority=EventPriority.HIGHEST) public static void breaking(BlockEvent.BreakEvent event){if(active(event.getPlayer()))event.setCanceled(true);}
+ @SubscribeEvent(priority=EventPriority.HIGHEST) public static void left(net.minecraftforge.event.entity.player.PlayerInteractEvent.LeftClickBlock event){if(YuleTemperance.denied(event.getEntity(),event.getPos()))event.setCanceled(true);}
+ @SubscribeEvent(priority=EventPriority.HIGHEST) public static void breaking(BlockEvent.BreakEvent event){if(YuleTemperance.denied(event.getPlayer(),event.getPos()))event.setCanceled(true);}
  @SubscribeEvent public static void grief(net.minecraftforge.event.entity.EntityMobGriefingEvent event){if(friendly(event.getEntity()))event.setResult(Event.Result.DENY);}
  @SubscribeEvent public static void living(LivingEvent.LivingTickEvent event){if(!event.getEntity().level().isClientSide&&event.getEntity() instanceof Mob mob&&friendly(mob))clearBrain(mob);}
  @SubscribeEvent public static void player(TickEvent.PlayerTickEvent event){

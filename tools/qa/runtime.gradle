@@ -23,3 +23,27 @@ if (project.hasProperty('sevenVisual')) {
   mods { starcrownqa { source sourceSets.qaMod } }
  }
 }
+
+if (project.hasProperty('visibilityFix')) {
+ minecraft.runs.client {
+  workingDirectory project.file('../work/visibility-fix-client')
+  args '--username', 'VisibilityQA', '--width', '1000', '--height', '700', '--quickPlaySingleplayer', 'HumilityQA'
+  mods { starcrownqa { source sourceSets.qaMod } }
+ }
+}
+
+if (project.hasProperty('panelRuntime')) {
+ minecraft.runs.client {
+  workingDirectory project.file('../work/panel-runtime-client')
+  args '--username', 'PanelQA', '--width', '1280', '--height', '900', '--quickPlaySingleplayer', 'HumilityQA'
+  mods { starcrownqa { source sourceSets.qaMod } }
+ }
+}
+
+if (project.hasProperty('fishHugVisual')) {
+ minecraft.runs.client {
+  workingDirectory project.file('../work/fish-hug-client')
+  args '--username', 'FishHugQA', '--width', '1100', '--height', '760'
+  mods { starcrownqa { source sourceSets.qaMod } }
+ }
+}
