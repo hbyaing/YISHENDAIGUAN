@@ -17,23 +17,22 @@ public final class DivineWill {
  static final String LEASE="starcrowndoll_will_lease";
  static final UUID SPEED=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3021"),BLOCK=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3022"),ENTITY=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3023"),KNOCK=UUID.fromString("48ae1082-6b55-4db0-a437-7311a00e3024");
  public static boolean wearing(Player p){return !p.isSpectator()&&(p.getItemBySlot(EquipmentSlot.HEAD).is(StarcrownDoll.ITEM.get())||(p instanceof ServerPlayer sp&&DivineAnchor.locked(sp)));}
+ public static boolean automaticBenefit(MobEffect effect){return effect.getCategory()==MobEffectCategory.BENEFICIAL;}
  public static boolean unwanted(MobEffectInstance effect){return effect!=null&&effect.getEffect().getCategory()!=MobEffectCategory.BENEFICIAL;}
  static void modifier(ServerPlayer p,Attribute attribute,UUID id,double value,AttributeModifier.Operation op,boolean enable){var a=p.getAttribute(attribute);if(a==null)return;if(enable){if(a.getModifier(id)!=null&&a.getModifier(id).getAmount()!=value)a.removeModifier(id);if(a.getModifier(id)==null)a.addTransientModifier(new AttributeModifier(id,"starcrowndoll_will",value,op));}else a.removeModifier(id);}
  static boolean ownVision(MobEffectInstance e){return e!=null&&e.getAmplifier()==0&&e.isAmbient()&&!e.isVisible()&&!e.showIcon()&&!e.isInfiniteDuration()&&e.getDuration()<=400;}
  static CompoundTag elapsedEffect(CompoundTag original,long elapsed){var t=original.copy();int d=t.getInt("Duration");if(d>=0)t.putInt("Duration",(int)Math.max(0,d-Math.min(elapsed,Integer.MAX_VALUE)));if(t.contains("HiddenEffect"))t.put("HiddenEffect",elapsedEffect(t.getCompound("HiddenEffect"),elapsed));return t;}
  private static void benefits(ServerPlayer p,boolean enabled){
   var lease=p.getPersistentData().getCompound(LEASE);var saved=lease.getCompound("benefits");long now=p.serverLevel().getGameTime();
-  for(var effect:net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS){if(effect.getCategory()!=MobEffectCategory.BENEFICIAL||(effect==MobEffects.NIGHT_VISION||effect==MobEffects.INVISIBILITY))continue;String key=net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();var current=p.getEffect(effect);
+  for(var effect:net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS){if(effect.getCategory()!=MobEffectCategory.BENEFICIAL||effect==MobEffects.NIGHT_VISION)continue;String key=net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getKey(effect).toString();var current=p.getEffect(effect);
    if(enabled){if(current!=null&&(current.isInfiniteDuration()||current.getAmplifier()>0||current.getDuration()>240))continue;
     if(!saved.contains(key)){var backup=new CompoundTag();backup.putLong("tick",now);if(current!=null)backup.put("effect",current.save(new CompoundTag()));saved.put(key,backup);}
     p.addEffect(new MobEffectInstance(effect,240,0,true,false,false));
    }else if(saved.contains(key)&&current!=null&&current.getAmplifier()==0&&current.isAmbient()&&!current.isVisible()&&!current.showIcon()&&current.getDuration()<=240){p.removeEffect(effect);var back=saved.getCompound(key);if(back.contains("effect")){var old=MobEffectInstance.load(elapsedEffect(back.getCompound("effect"),now-back.getLong("tick")));if(old!=null&&(old.isInfiniteDuration()||old.getDuration()>0))p.addEffect(old);}}
   }lease.put("benefits",saved);
  }
- private static void excludeInvisibility(ServerPlayer p){var lease=p.getPersistentData().getCompound(LEASE);var saved=lease.getCompound("benefits");String key=net.minecraftforge.registries.ForgeRegistries.MOB_EFFECTS.getKey(MobEffects.INVISIBILITY).toString();if(!saved.contains(key))return;var current=p.getEffect(MobEffects.INVISIBILITY);var backup=saved.getCompound(key);if(current!=null&&current.getAmplifier()==0&&current.isAmbient()&&!current.isVisible()&&!current.showIcon()&&!current.isInfiniteDuration()&&current.getDuration()<=240){p.removeEffect(MobEffects.INVISIBILITY);if(backup.contains("effect")){var original=MobEffectInstance.load(elapsedEffect(backup.getCompound("effect"),Math.max(0,p.serverLevel().getGameTime()-backup.getLong("tick"))));if(original!=null&&(original.isInfiniteDuration()||original.getDuration()>0))p.addEffect(original);}}saved.remove(key);}
  public static void update(ServerPlayer p,boolean enable){
   var data=p.getPersistentData();long now=p.getServer().overworld().getGameTime();
-  excludeInvisibility(p);
   if(enable){
    if(!data.contains(LEASE)){var tag=new CompoundTag();tag.putBoolean("mayfly_before",p.getAbilities().mayfly);tag.putFloat("flight_before",p.getAbilities().getFlyingSpeed());data.put(LEASE,tag);}
    var tag=data.getCompound(LEASE);

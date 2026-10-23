@@ -1,0 +1,42 @@
+以神戴冠1.19.0 / Forge1.20.1 47.4.26 / Java17 / 独立正式客户端 + QA附加包
+PASS new zombie replaced in join event
+PASS zombie instantly restored as named villager
+PASS new skeleton disarmed and friendly without freezing AI
+PASS outside 48-block radius unchanged
+PASS Player.attack entry revoked
+PASS forced direct hurt attributed to wearer blocked
+PASS nonliving-style armor stand harm blocked
+PASS end crystal attack/explosion prevented
+PASS pacified mobs no longer treated as enemies by other AI
+PASS pet damage attributed to wearer blocked
+PASS pacified mob cannot target or melee anyone
+PASS pacified mob damage sources harmless
+PASS incoming attack canceled before health loss
+PASS both sides receive Regeneration X and Absorption X for 10 seconds
+PASS both sides receive Regeneration X and Absorption X for 10 seconds
+PASS wearer projectile permanently marked harmless
+PASS projectile remains harmless after unequip
+PASS attributed poison/debuff cannot become delayed harm
+PASS actual TNT block-item placement succeeds
+PASS redstone-instant TNT ignition inherits owner
+PASS owned TNT explosion harms neither entities nor blocks after unequip
+PASS actual lava bucket empty succeeds
+PASS placed lava provenance recorded
+PASS placed lava cannot injure or ignite after unequip
+PASS unrelated TNT retains ordinary damage
+PASS existing hostile mob pacified by recurring field scan
+PASS flowing lava descendant harmless
+PASS actual lava flow inherits provenance
+PASS hazard owner survives SavedData serialization
+PASS removed hazard cell forgets owner
+SERVER_PASS
+PASS client attack key and swing stripped
+PASS localized second virtue registered
+ALL_PASS
+
+范围：水平半径48格、整个建筑高度，不强制加载区块。生成加入世界时即时处理，已有敌对生物每秒扫描一次。僵尸/尸壳/溺尸/僵尸村民转为村民（保留名称、幼体及已有村民职业数据）；其他敌对分类/Enemy生物永久标记友好、禁止攻击目标、解除手持物并保存至实体NBT，保留非攻击AI。中立僵尸猪灵不转村民，但可安抚。
+宽容优先于原谦逊的1点伤害上限：取消玩家攻击键、左键破坏及直接Player.attack；DamageSource可归属的近战、箭、宠物/载具、爆炸等伤害取消。带来源的有害效果禁止施加，防止归属可见的中毒后续伤害。
+自放TNT通过实际BlockItem放置提前记归属，覆盖红石即时引燃，爆炸不会伤实体或毁坏方块。桶放液体记录归属，流动继承，接触归属岩浆既不掉血也不点燃；记录保存于各维度SavedData。归属标记不因摘下或退出而复原，清除格子时移除记录。
+攻击命中佩戴者时取消伤害，佩戴者及活体攻击者均获得REGENERATION和ABSORPTION，amplifier9、200tick；亡灵生物通过短作用域的效果适用性事件允许生命恢复。
+已验证场景见PASS列表；测试不宣称覆盖没有任何来源信息的第三方直接改血/JVM操作或任意自定义伤害实现。
+发布JAR与测试正式JAR全部条目相同，不含测试附加模组。两首增强音频及1.18.6音乐优先/手部渲染代码保持逐字节一致。

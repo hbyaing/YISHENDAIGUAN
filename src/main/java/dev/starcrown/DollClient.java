@@ -22,6 +22,8 @@ public class DollClient {
    lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.virtues").withStyle(net.minecraft.ChatFormatting.GOLD));
    var description=net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.humility").withStyle(net.minecraft.ChatFormatting.GRAY);
    lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.humility.name").withStyle(net.minecraft.ChatFormatting.BOLD).append(description.withStyle(net.minecraft.network.chat.Style.EMPTY.withColor(net.minecraft.ChatFormatting.GRAY).withBold(false))));
+   lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.tolerance.name").withStyle(net.minecraft.ChatFormatting.BOLD).append(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.tolerance").withStyle(net.minecraft.network.chat.Style.EMPTY.withColor(net.minecraft.ChatFormatting.GRAY).withBold(false))));
+   lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.generosity.name").withStyle(net.minecraft.ChatFormatting.BOLD).append(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.yule.generosity").withStyle(net.minecraft.network.chat.Style.EMPTY.withColor(net.minecraft.ChatFormatting.GRAY).withBold(false))));
    for(String key:new String[]{"yule.animation","wear","music","yule.feast","place"})lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll."+key).withStyle(net.minecraft.ChatFormatting.GRAY));
   }
   else lines.add(net.minecraft.network.chat.Component.translatable("tooltip.starcrowndoll.shift").withStyle(net.minecraft.network.chat.Style.EMPTY.withColor(0x999999)));

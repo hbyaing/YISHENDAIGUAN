@@ -24,7 +24,7 @@ public final class DollHands {
   var pose=event.getPoseStack();var buffers=event.getMultiBufferSource();int light=event.getPackedLight();
   pose.pushPose();
   pose.translate(side*.46,-.31-event.getEquipProgress()*.6-Math.sin(event.getSwingProgress()*Math.PI)*.06,-.92);
-  if(!player.isInvisible()&&mc.getEntityRenderDispatcher().getRenderer(player) instanceof PlayerRenderer renderer){
+  if((!player.isInvisible()||DivineWill.wearing(player))&&mc.getEntityRenderDispatcher().getRenderer(player) instanceof PlayerRenderer renderer){
    pose.pushPose();pose.translate(0,-.12,.12);pose.mulPose(Axis.XP.rotationDegrees(-75));
    pose.translate(side*.3125,-.68,0);
    if(arm==HumanoidArm.RIGHT)renderer.renderRightHand(pose,buffers,light,player);else renderer.renderLeftHand(pose,buffers,light,player);

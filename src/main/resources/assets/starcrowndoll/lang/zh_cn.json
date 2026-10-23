@@ -28,7 +28,7 @@
   "tooltip.starcrowndoll.yule.virtues": "七美德",
   "tooltip.starcrowndoll.yule.humility.name": "谦逊",
   "tooltip.starcrowndoll.yule.humility": "：因为践行谦逊之德，你永远无法穿戴任何高于“铁质”品阶的护甲与武器，且你的体型被恒定缩小至半格高，单次造成的伤害永远无法超过1点（半颗心）；但世界会庇护低头之人，你同时受到的【最高单次伤害】也被强制锁死在1点（无视虚空、爆炸与即死指令），且你拥有底层级的“存在感抹除”——所有敌对生物、潜声感测体乃至凋灵和末影龙，在代码层面上都完全无法感知或锁定你的存在。",
-  "tooltip.starcrowndoll.skill2.benefits": "持续获得所有注册为正面的状态效果（不含隐身）；新加入模组的正面效果自动纳入。",
+  "tooltip.starcrowndoll.skill2.benefits": "持续获得所有模组注册的正面状态，包括隐身、鬼魂形态等。佩戴时强制显示玩家皮肤，不移除隐身状态，并隐藏玩家火焰动画。",
   "tooltip.starcrowndoll.skill4": "功能四：僭越啊！归还汝所窃取之权柄",
   "tooltip.starcrowndoll.skill4.effect": "攻击你的敌人被标记，压制护盾、回血与常规复活；你的攻击追加其最大生命值25%的伤害，四次神罚触发处决，不针对玩家。",
   "tooltip.starcrowndoll.skill5": "功能五：万象啊！皆当遵从吾至高律令",
@@ -45,5 +45,10 @@
   "effect.starcrowndoll.cost": "代价",
   "tooltip.starcrowndoll.skill4.authority": "玩偶佩戴者攻击自身后，会被没收其权柄",
   "death.attack.starcrowndoll.cost": "%1$s 付出了代价",
-  "death.attack.starcrowndoll.cost.player": "%1$s 向 %2$s 付出了代价"
+  "death.attack.starcrowndoll.cost.player": "%1$s 向 %2$s 付出了代价",
+  "tooltip.starcrowndoll.yule.tolerance.name": "宽容",
+  "tooltip.starcrowndoll.yule.tolerance": "：因为践行宽容之德，你的攻击键被彻底剥夺，无法对实体造成直接或间接伤害；你放置的TNT、岩浆及其后续流动也失去杀伤力。以你为中心水平48格（3个区块）的绝对和平领域将敌对生物转化或安抚为友好生物：僵尸还原为村民，骷髅放下弓箭。针对你的攻击取消伤害，并使你与攻击者获得10秒生命恢复X和伤害吸收X。",
+  "tooltip.starcrowndoll.yule.generosity.name": "慷慨",
+  "tooltip.starcrowndoll.yule.generosity": "：仅快捷栏可存物，主背包锁定；每分钟随机散出1～3件物品。按Q主动丢出时数量不变、逐级升值；安装等价交换后按EMC随机升值（优先当前单件价值的4倍以内，无候选则取最近更高档）。无EMC或无更高候选保留原物。其他玩家或生物拾取赠礼后，双方永久获得村庄英雄X，所有属性及有效上限翻倍一次。",
+  "entity.starcrowndoll.generous_gift": "慷慨之礼：%s"
 }

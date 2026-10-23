@@ -49,12 +49,29 @@
     "HumilityShrieker",
     "HumilityDragon",
     "HumilityWither",
-    "CreativeUnequip"
+    "CreativeUnequip",
+    "ToleranceDamage",
+    "ToleranceMob",
+    "ToleranceLava",
+    "ToleranceBucket",
+    "ToleranceFluid",
+    "ToleranceBlocks",
+    "ToleranceTntPlacement",
+    "ToleranceEffects",
+    "GenerosityLiving",
+    "GenerosityAttribute",
+    "GenerosityInventory",
+    "GenerositySlot",
+    "GenerosityQ",
+    "GenerosityMenuQ",
+    "GenerosityGift"
   ],
   "injectors": {
     "defaultRequire": 0
   },
   "client": [
-    "HumilityPlayerRenderer"
+    "HumilityPlayerRenderer",
+    "DivineSkinRenderer",
+    "DivineHands"
   ]
 }

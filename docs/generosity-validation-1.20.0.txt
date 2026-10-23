@@ -1,0 +1,105 @@
+以神戴冠 1.20.0 / Minecraft 1.20.1 / Forge 47.4.26 / Java 17
+隔离正式客户端与集成服务器验收，未修改用户游戏实例或原存档。
+
+ProjectE可选联动：ProjectE-1.20.1-PE1.0.1.jar（CurseForge正式文件4901949）
+SHA1 affd130b8a77e60dd7d7f7f3621d0182d82d13e1
+下载页 https://www.curseforge.com/minecraft/mc-mods/projecte/files/4901949
+使用公开 IEMCProxy.INSTANCE.getValue(ItemStack)，没有打包ProjectE代码或强制前置。
+
+通过项目：
+- 不安装ProjectE可进入世界；圆石→铁锭→金锭→钻石→下界合金逐级升值。
+- 安装ProjectE可进入世界；连续80次17个圆石转换，数量不变、EMC严格增加、结果在4倍以内且包含多种随机结果。
+- 未知无EMC特殊物品保留原件和NBT；EMC候选重新检查实际价值和堆叠上限。
+- 真实Ctrl+Q和背包内悬停Q触发升值；自动散财不触发升值。
+- 主背包27格锁定，显式Inventory.add拒绝，setItem安全转入快捷栏。
+- 快捷栏满时27个主背包物品全部散出，无删除；1200刻计时触发散财并归零。
+- 自己捡回、满背包未成功拾取不奖励；真实其他来源物品拾取授予永久祝福。
+- 生物take收集入口授予祝福；离线赠送者记录待领取永久奖励。
+- 村庄英雄X无限时长，生命上限20→40，重复领取仍为40，属性原生有效上限1024→2048。
+- 取下玩偶解锁背包，已经获得的永久祝福保留。
+- 修正原版实体追踪不向玩家本人广播自定义数据的问题，客户端最终上限与服务端一致。
+- 两种环境均正常退出保存并重新启动：永久翻倍、永久村庄英雄X和客户端同步复验全部通过。
+- 普通build/reobfJar通过；正式包所有条目与实测包内容完全一致；无QA测试类或ProjectE内置类。
+
+范围说明：模组物品需由ProjectE提供EMC；无值物品不虚构价值。超过4倍范围且没有合适候选时使用最近更高可用档位，无更高目标则保留。自动散财每分钟1～3单位，来源头部玩偶保留。永久属性翻倍针对注册属性的最终值，不叠加，不覆盖各模组自行实现、没有注册为Attribute的特殊数值。生物按其原生拾取行为触发奖励。
+
+无ProjectE首次验收
+PASS equip preserves main-inventory contents in hotbar
+PASS locked main-inventory slot refuses placement
+PASS explicit inventory add refuses locked slot
+PASS direct setter safely redirects into hotbar
+PASS optional dependency presence matches test mode
+PASS iron advances to gold
+PASS diamond advances to netherite
+PASS unknown no-EMC special item and NBT retained
+PASS native Ctrl-Q succeeds
+PASS native Ctrl-Q creates one same-count gift
+PASS native Ctrl-Q invokes manual conversion
+PASS native Ctrl-Q applies material ladder
+PASS inventory hover-Q invokes conversion
+PASS automatic scatter emits 1-3 original units without upgrade
+PASS scatter retains source doll
+PASS full hotbar safely scatters all 27 occupied main slots
+PASS failed full-inventory pickup grants no reward
+PASS 1200-tick timer triggers scatter and resets
+PASS self pickup does not grant permanent reward
+PASS actual player pickup grants blessing
+PASS offline donor reward saved
+PASS permanent Hero X applied
+PASS health doubles once
+PASS repeated blessing does not stack
+PASS effective attribute cap doubles
+PASS mob collection grants permanent reward to mob and donor
+PASS permanent player reward survives serialization
+PASS removing doll unlocks inventory
+SERVER_PASS
+PASS client receives blessing and doubled health
+ALL_PASS
+
+有ProjectE首次验收
+PASS equip preserves main-inventory contents in hotbar
+PASS locked main-inventory slot refuses placement
+PASS explicit inventory add refuses locked slot
+PASS direct setter safely redirects into hotbar
+PASS optional dependency presence matches test mode
+PASS ProjectE conversion has multiple random outcomes
+PASS unknown no-EMC special item and NBT retained
+PASS native Ctrl-Q succeeds
+PASS native Ctrl-Q creates one same-count gift
+PASS native Ctrl-Q invokes manual conversion
+PASS native Ctrl-Q applies EMC conversion
+PASS inventory hover-Q invokes conversion
+PASS automatic scatter emits 1-3 original units without upgrade
+PASS scatter retains source doll
+PASS full hotbar safely scatters all 27 occupied main slots
+PASS failed full-inventory pickup grants no reward
+PASS 1200-tick timer triggers scatter and resets
+PASS self pickup does not grant permanent reward
+PASS actual player pickup grants blessing
+PASS offline donor reward saved
+PASS permanent Hero X applied
+PASS health doubles once
+PASS repeated blessing does not stack
+PASS effective attribute cap doubles
+PASS mob collection grants permanent reward to mob and donor
+PASS permanent player reward survives serialization
+PASS removing doll unlocks inventory
+SERVER_PASS
+CLIENT_READY
+PASS client receives blessing and doubled health
+ALL_PASS
+
+无ProjectE完整重启
+PASS player permanent doubling survives full game restart
+PASS permanent Hero X restored after restart
+SERVER_PASS
+PASS client receives blessing and doubled health
+ALL_PASS
+
+有ProjectE完整重启
+PASS player permanent doubling survives full game restart
+PASS permanent Hero X restored after restart
+SERVER_PASS
+CLIENT_READY
+PASS client receives blessing and doubled health
+ALL_PASS

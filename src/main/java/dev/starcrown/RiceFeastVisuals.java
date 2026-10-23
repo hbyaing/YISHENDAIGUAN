@@ -33,6 +33,10 @@ public final class RiceFeastVisuals {
   event.setCanceled(true);if(event.getHand()!=InteractionHand.MAIN_HAND)return;
   var pose=event.getPoseStack();double time=mc.level.getGameTime()+event.getPartialTick();
   pose.pushPose();pose.translate(.12,-.22+Math.abs(Math.sin(time*1.5))*.035,-.48);pose.mulPose(Axis.XP.rotationDegrees(12));pose.scale(.6f,.6f,.6f);
+  if(DivineWill.wearing(mc.player)&&mc.getEntityRenderDispatcher().getRenderer(mc.player) instanceof net.minecraft.client.renderer.entity.player.PlayerRenderer renderer){
+   pose.pushPose();pose.translate(.18,-.13,.16);pose.mulPose(Axis.XP.rotationDegrees(-75));pose.translate(.3125,-.68,0);
+   renderer.renderRightHand(pose,event.getMultiBufferSource(),event.getPackedLight(),mc.player);pose.popPose();
+  }
   mc.getItemRenderer().renderStatic(new ItemStack(StarcrownDoll.WHITE_RICE.get()),ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,event.getPackedLight(),OverlayTexture.NO_OVERLAY,pose,event.getMultiBufferSource(),mc.level,0);
   pose.popPose();
  }

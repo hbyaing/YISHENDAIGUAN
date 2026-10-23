@@ -1,0 +1,31 @@
+{
+  "upgrades": {
+    "minecraft:cobblestone": "minecraft:iron_ingot",
+    "minecraft:cobbled_deepslate": "minecraft:iron_ingot",
+    "minecraft:dirt": "minecraft:cobblestone",
+    "minecraft:gravel": "minecraft:iron_ingot",
+    "minecraft:sand": "minecraft:glass",
+    "minecraft:glass": "minecraft:iron_ingot",
+    "minecraft:coal": "minecraft:iron_ingot",
+    "minecraft:charcoal": "minecraft:iron_ingot",
+    "minecraft:raw_copper": "minecraft:copper_ingot",
+    "minecraft:copper_ingot": "minecraft:iron_ingot",
+    "minecraft:raw_iron": "minecraft:iron_ingot",
+    "minecraft:iron_ingot": "minecraft:gold_ingot",
+    "minecraft:raw_gold": "minecraft:gold_ingot",
+    "minecraft:gold_ingot": "minecraft:diamond",
+    "minecraft:diamond": "minecraft:netherite_ingot",
+    "minecraft:netherite_ingot": "minecraft:netherite_block",
+    "minecraft:copper_block": "minecraft:iron_block",
+    "minecraft:iron_block": "minecraft:gold_block",
+    "minecraft:gold_block": "minecraft:diamond_block",
+    "minecraft:diamond_block": "minecraft:netherite_block",
+    "minecraft:redstone": "minecraft:iron_ingot",
+    "minecraft:lapis_lazuli": "minecraft:iron_ingot",
+    "minecraft:quartz": "minecraft:gold_ingot",
+    "minecraft:emerald": "minecraft:diamond",
+    "minecraft:oak_log": "minecraft:iron_ingot",
+    "minecraft:wheat": "minecraft:bread",
+    "minecraft:potato": "minecraft:baked_potato"
+  }
+}

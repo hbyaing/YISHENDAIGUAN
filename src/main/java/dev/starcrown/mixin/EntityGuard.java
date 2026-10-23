@@ -7,6 +7,8 @@ import org.spongepowered.asm.mixin.injection.*;
 import org.spongepowered.asm.mixin.injection.callback.*;
 @Mixin(Entity.class)
 public abstract class EntityGuard {
+ @Inject(method={"displayFireAnimation()Z","m_6051_()Z"},at=@At("HEAD"),cancellable=true,remap=false,require=1)
+ private void divineVisible(CallbackInfoReturnable<Boolean> ci){if((Object)this instanceof net.minecraft.world.entity.player.Player p&&dev.starcrown.DivineWill.wearing(p))ci.setReturnValue(false);}
  @Inject(method={"teleportTo(DDD)V","m_6021_(DDD)V"},at=@At("HEAD"),cancellable=true,remap=false,require=1)
  private void sevenTeleport(double x,double y,double z,CallbackInfo ci){if(dev.starcrown.DivineSeven.ruled((Entity)(Object)this))ci.cancel();}
 

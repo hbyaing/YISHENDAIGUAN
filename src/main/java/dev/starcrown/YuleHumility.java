@@ -65,7 +65,7 @@ public final class YuleHumility {
    var returned=stack.copy();player.setItemSlot(slot,ItemStack.EMPTY);
    // Inventory.add would put the item straight back into an empty selected hotbar slot.
    for(int offset=0;offset<36&&!returned.isEmpty();offset++){
-    int index=(offset+9)%36;if(index==player.getInventory().selected)continue;
+    int index=(offset+9)%36;if(index==player.getInventory().selected||YuleGenerosity.locked(player,index))continue;
     var stored=player.getInventory().getItem(index);
     if(stored.isEmpty()){int count=Math.min(returned.getCount(),returned.getMaxStackSize());player.getInventory().setItem(index,returned.split(count));}
     else if(ItemStack.isSameItemSameTags(stored,returned)){int count=Math.min(returned.getCount(),stored.getMaxStackSize()-stored.getCount());if(count>0){stored.grow(count);returned.shrink(count);}}
