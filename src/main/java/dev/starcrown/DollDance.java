@@ -16,12 +16,15 @@ import java.util.*;
 @Mod.EventBusSubscriber(modid=StarcrownDoll.ID)
 public final class DollDance {
  private static final Map<Level,Set<BlockPos>> SOURCES=Collections.synchronizedMap(new WeakHashMap<>());
+ private static final Map<Level,List<BlockPos>> SOURCE_LISTS=Collections.synchronizedMap(new WeakHashMap<>());
  private static final Map<Mob,Vec3> LOCKS=new WeakHashMap<>();
  public static void sourceChanged(StarcrownDoll.DollEntity doll){
   Level level=doll.getLevel();if(level==null)return;
   Set<BlockPos> sources=SOURCES.computeIfAbsent(level,l->new HashSet<>());
-  if(doll.isPlaying()&&!doll.isRemoved())sources.add(doll.getBlockPos().immutable());else sources.remove(doll.getBlockPos());
+  boolean changed=doll.isPlaying()&&!doll.isRemoved()?sources.add(doll.getBlockPos().immutable()):sources.remove(doll.getBlockPos());
+  if(changed)SOURCE_LISTS.remove(level);
  }
+ private static List<BlockPos> sources(Level level){return SOURCE_LISTS.computeIfAbsent(level,l->List.copyOf(SOURCES.getOrDefault(l,Set.of())));}
  public static boolean controlled(Mob mob){return mob.isAlive()&&nearSource(mob.level(),mob.level().isClientSide?mob.position():LOCKS.getOrDefault(mob,mob.position()));}
  public static boolean nearSource(Level level,Vec3 point){
   return nearSource(level,point,false);
@@ -29,12 +32,12 @@ public final class DollDance {
  public static boolean nearYule(Level level,Vec3 point){return nearSource(level,point,true);}
  public static Set<net.minecraft.world.entity.LivingEntity> feastTargets(Level level){
   Set<net.minecraft.world.entity.LivingEntity> result=new HashSet<>();
-  for(BlockPos pos:List.copyOf(SOURCES.getOrDefault(level,Set.of())))if(level.hasChunkAt(pos)&&level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll&&doll.isPlaying()&&!doll.isRemoved()&&doll.getBlockState().is(StarcrownDoll.YULE_DOLL.get()))
+  for(BlockPos pos:sources(level))if(level.hasChunkAt(pos)&&level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll&&doll.isPlaying()&&!doll.isRemoved()&&doll.getBlockState().is(StarcrownDoll.YULE_DOLL.get()))
    result.addAll(level.getEntitiesOfClass(net.minecraft.world.entity.LivingEntity.class,new AABB(pos).inflate(16),e->e.isAlive()&&!e.isSpectator()&&e.position().distanceToSqr(Vec3.atCenterOf(pos))<=256));
   return result;
  }
  private static boolean nearSource(Level level,Vec3 point,boolean yuleOnly){
-  for(BlockPos pos:List.copyOf(SOURCES.getOrDefault(level,Set.of()))) {
+  for(BlockPos pos:sources(level)) {
    if(!level.hasChunkAt(pos))continue;
    if(level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll&&!doll.isRemoved()&&doll.isPlaying()&&(!yuleOnly||doll.getBlockState().is(StarcrownDoll.YULE_DOLL.get()))&&point.distanceToSqr(Vec3.atCenterOf(pos))<=256)return true;
   }
@@ -57,12 +60,13 @@ public final class DollDance {
   }
  }
  @SubscribeEvent public static void levelTick(TickEvent.LevelTickEvent event){
-  Level level=event.level;if(level.isClientSide)return;
+  Level level=event.level;if(level.isClientSide||event.phase!=TickEvent.Phase.START)return;
   refresh(level);
-  for(BlockPos pos:List.copyOf(SOURCES.getOrDefault(level,Set.of()))){
+  Set<Mob> seen=Collections.newSetFromMap(new IdentityHashMap<>());
+  for(BlockPos pos:sources(level)){
    if(!level.hasChunkAt(pos))continue;
-   if(!(level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll)||doll.isRemoved()||!doll.isPlaying()){SOURCES.get(level).remove(pos);continue;}
-   for(Mob mob:level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(16)))if(controlled(mob))hold(mob);
+   if(!(level.getBlockEntity(pos) instanceof StarcrownDoll.DollEntity doll)||doll.isRemoved()||!doll.isPlaying()){SOURCES.get(level).remove(pos);SOURCE_LISTS.remove(level);continue;}
+   for(Mob mob:level.getEntitiesOfClass(Mob.class,new AABB(pos).inflate(16)))if(seen.add(mob)&&controlled(mob))hold(mob);
   }
  }
 }

@@ -67,5 +67,5 @@ foreach($mixin in $targets.Keys){
  }
  }
 }
-if($checked -ne 76){throw "Expected 76 required hook groups, inspected $checked"}
+if($checked -ne 77){throw "Expected 77 required hook groups, inspected $checked"}
 Write-Output "PASS: $checked required hooks match declared method descriptors in $MinecraftJar"

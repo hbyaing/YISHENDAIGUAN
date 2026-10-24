@@ -27,22 +27,30 @@ public final class DollTooltip {
  @SubscribeEvent public static void render(RenderTooltipEvent.Pre event){
   if(!event.getItemStack().is(StarcrownDoll.ITEM.get()))return;
   event.setCanceled(true);
-  draw(event.getGraphics(),event.getX(),event.getY(),event.getScreenWidth(),event.getScreenHeight(),Screen.hasShiftDown(),event.getItemStack().getHoverName());
+  if(TooltipReading.pinned())return;
+  draw(event.getGraphics(),event.getX(),event.getY(),event.getScreenWidth(),event.getScreenHeight(),false,event.getItemStack().getHoverName());
  }
  public static double sway(double seconds){return (1-Math.cos(seconds*Math.PI*2/2.8))*.5;}
  public static void draw(GuiGraphics g,int mouseX,int mouseY,int screenW,int screenH,boolean expanded,Component name){
+  TooltipReading.track(mouseX,mouseY,name);
   var font=Minecraft.getInstance().font;
   int maxWidth=Math.max(90,Math.min(expanded?330:230,screenW-24));
+  var layout=TooltipLayouts.get("chengran",maxWidth,expanded,name,()->{
   List<Line> lines=new ArrayList<>();
   add(lines,name.getString(),false,0,maxWidth);
   if(expanded)add(lines,"以神戴冠",false,0,maxWidth);
   add(lines,tr("divinity"),false,2,maxWidth);
   add(lines,tr("lore"),expanded,1,maxWidth);
-  if(expanded)for(String key:KEYS)add(lines,tr(key),true,0,maxWidth);
+  int headerLines=lines.size();
+  if(expanded)for(String key:KEYS){add(lines,tr(key),true,0,maxWidth);if(key.matches("skill[1-7]\\..*|anchor|controls|wear|music|place"))lines.add(new Line(FormattedCharSequence.EMPTY,0));}
   else add(lines,tr("shift"),false,0,maxWidth);
+  return new TooltipLayouts.Layout<>(List.copyOf(lines),headerLines);
+  });
+  var reading=TooltipReading.select(layout.lines(),layout.header(),screenH,"chengran",expanded);var lines=reading.lines();
   int textW=1;for(Line line:lines)textW=Math.max(textW,font.width(line.text));
-  int panelW=textW+14,panelH=lines.size()*11+12;
-  float scale=Math.min(1,Math.min((screenH-18f)/panelH,(screenW-18f)/panelW));
+  int rowHeight=expanded?13:11;
+  int panelW=textW+14,panelH=lines.size()*rowHeight+12+(expanded?15:0);
+  float scale=1;
   float w=panelW*scale,h=panelH*scale;
   float x=mouseX+12,y=mouseY-10;
   if(x+w>screenW-6)x=mouseX-12-w;
@@ -60,12 +68,15 @@ public final class DollTooltip {
    portrait(g,px+(float)sway(t)*portraitW*.019f,py,portraitW,portraitH,(float)sway(t)*.075f,1);
    g.pose().pushPose();g.pose().translate(x,y,2);g.pose().scale(scale,scale,1);
    g.fillGradient(0,0,panelW,panelH,0x9817102b,0x8c100d25);
+   g.drawManaged(()->{
    // Translucent nebula patches under sparse interior stars.
    for(int band=0;band<14;band++){int left=(int)(panelW*(.08+.055*band)),top=(int)(panelH*(.35+.13*Math.sin(band*.45+t*.08)));
     g.fillGradient(left,Math.max(1,top-12),Math.min(panelW-1,left+20),Math.min(panelH-1,top+18),0x078c49c3,0x03416dbb);}
    for(int i=0;i<85;i++){int sx=1+(int)(fract(i*.61803398875+t*.0015)*(panelW-2)),sy=1+(int)(fract(i*.41421356237)*(panelH-2));int alpha=(int)(255*(.16+.28*(.5+.5*Math.sin(t*(.7+i%3*.2)+i))));g.fill(sx,sy,sx+1,sy+1,(alpha<<24)|(i%4==0?0xa5c6ff:0xeee0ff));}
    frame(g,panelW,panelH,t);
-   g.pose().translate(0,0,2);int lineY=6;for(Line line:lines){gradientLine(g,line.text,7,lineY,line.palette,t,scale,x,y);lineY+=11;}
+   });
+   g.pose().translate(0,0,2);int lineY=6;for(Line line:lines){if(expanded)TooltipReading.text(g,line.text,7,lineY,line.palette==2?GOD:line.palette==1?NEON:STARS,t);else gradientLine(g,line.text,7,lineY,line.palette,t,scale,x,y);lineY+=rowHeight;}
+   if(expanded)g.drawString(font,TooltipReading.footer(reading),7,panelH-13,0xece5ff,false);
    g.pose().popPose();g.flush();
   }finally{RenderSystem.setShaderColor(1,1,1,1);RenderSystem.defaultBlendFunc();g.pose().popPose();}
  }
@@ -88,17 +99,19 @@ public final class DollTooltip {
    if(i%19==0){g.fill(sx-1,sy,sx+2,sy+1,color);g.fill(sx,sy-1,sx+1,sy+2,color);}
   }
  }
- private static void gradientLine(GuiGraphics g,FormattedCharSequence line,int x,int y,int palette,double time,float scale,float originX,float originY){
-  var font=Minecraft.getInstance().font;int total=Math.max(1,font.width(line));int[] colors=palette==2?GOD:palette==1?NEON:STARS;
+ static void gradientLine(GuiGraphics g,FormattedCharSequence line,int x,int y,int palette,double time,float scale,float originX,float originY){
+  var font=Minecraft.getInstance().font;int total=Math.max(1,font.width(line));int[] colors=palette==3?YuleItemTooltip.COLORS:palette==2?GOD:palette==1?NEON:STARS;
   // Horizontal one-pixel slices give glyphs a real diagonal gradient, including their vertical strokes.
   double dx=total*.65,dy=dx+8,denominator=dx*dx+dy*dy;
+  var glyphs=TooltipLayouts.glyphs(line);
   for(int row=0;row<10;row++){
    int top=(int)Math.floor(originY+(y+row)*scale),bottom=(int)Math.ceil(originY+(y+row+1)*scale);
    g.enableScissor((int)Math.floor(originX+x*scale),top,(int)Math.ceil(originX+(x+total+2)*scale),bottom);
-   final int scan=row;final int[] offset={0};
-   line.accept((index,style,code)->{String letter=new String(Character.toChars(code));float u=(float)((offset[0]*dx+(scan+8)*dy)/denominator-time*.36);var c=Component.literal(letter).withStyle(style.withColor(sample(colors,u)));g.drawString(font,c,x+offset[0],y,0xffffff,false);offset[0]+=font.width(c);return true;});
+   final int scan=row;
+   FormattedCharSequence colored=sink->{for(var glyph:glyphs){float u=(float)((glyph.x()*dx+(scan+8)*dy)/denominator-time*.36);if(!sink.accept(glyph.index(),glyph.style().withColor(sample(colors,u)),glyph.code()))return false;}return true;};
+   g.drawString(font,colored,x,y,0xffffff,false);
    g.disableScissor();
   }
  }
- private static int sample(int[] colors,float u){float v=(float)(u-Math.floor(u))*colors.length;int i=(int)v;float f=v-i;int a=colors[i%colors.length],b=colors[(i+1)%colors.length];return ((int)(((a>>16)&255)*(1-f)+((b>>16)&255)*f)<<16)|((int)(((a>>8)&255)*(1-f)+((b>>8)&255)*f)<<8)|(int)((a&255)*(1-f)+(b&255)*f);}
+ static int sample(int[] colors,float u){float v=(float)(u-Math.floor(u))*colors.length;int i=(int)v;float f=v-i;int a=colors[i%colors.length],b=colors[(i+1)%colors.length];return ((int)(((a>>16)&255)*(1-f)+((b>>16)&255)*f)<<16)|((int)(((a>>8)&255)*(1-f)+((b>>8)&255)*f)<<8)|(int)((a&255)*(1-f)+(b&255)*f);}
 }

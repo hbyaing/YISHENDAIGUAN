@@ -1,0 +1,4 @@
+Chengran compact samples=120 mean_ms=3.0269433333333335 median_ms=2.9758 p95_ms=3.4762
+Chengran expanded samples=120 mean_ms=3.2524983333333335 median_ms=3.0573 p95_ms=3.554
+Yule compact samples=120 mean_ms=3.3029983333333335 median_ms=3.2328 p95_ms=3.8357
+Yule expanded samples=120 mean_ms=7.823156666666667 median_ms=7.7225 p95_ms=8.2033

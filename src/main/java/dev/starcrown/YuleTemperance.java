@@ -20,10 +20,19 @@ public final class YuleTemperance {
  public static final String MINING="starcrowndoll_temperance_mining";
  private static final Map<Player,Boolean> PLAYERS=Collections.synchronizedMap(new WeakHashMap<>());
  private static final Map<FoodData,WeakReference<Player>> FOOD=Collections.synchronizedMap(new WeakHashMap<>());
+ private record Owned(WeakReference<Player> player,int slot){}
+ private static final Map<ItemStack,Owned> OWNERS=Collections.synchronizedMap(new WeakHashMap<>());
  public static boolean active(Entity e){return YuleHumility.active(e);}
  public static void bind(Player p){PLAYERS.put(p,true);FOOD.put(p.getFoodData(),new WeakReference<>(p));}
  public static boolean locked(FoodData f){var ref=FOOD.get(f);return ref!=null&&active(ref.get());}
- public static Player owner(ItemStack s){if(s==ItemStack.EMPTY)return null;synchronized(PLAYERS){for(var p:PLAYERS.keySet())if(active(p)){for(int i=0;i<p.getInventory().getContainerSize();i++)if(p.getInventory().getItem(i)==s)return p;if(p.containerMenu.getCarried()==s)return p;}}return null;}
+ public static Player owner(ItemStack s){
+  if(s==ItemStack.EMPTY)return null;
+  var known=OWNERS.get(s);if(known!=null){var p=known.player.get();if(p!=null&&active(p)&&(known.slot<0?p.containerMenu.getCarried()==s:p.getInventory().getItem(known.slot)==s))return p;OWNERS.remove(s);}
+  synchronized(PLAYERS){for(var p:PLAYERS.keySet())if(active(p)){
+   for(int i=0;i<p.getInventory().getContainerSize();i++)if(p.getInventory().getItem(i)==s){OWNERS.put(s,new Owned(new WeakReference<>(p),i));return p;}
+   if(p.containerMenu.getCarried()==s){OWNERS.put(s,new Owned(new WeakReference<>(p),-1));return p;}
+  }}return null;
+ }
  public static boolean equipped(ItemStack s,LivingEntity e){if(!active(e))return false;for(var slot:EquipmentSlot.values())if(e.getItemBySlot(slot)==s)return true;return false;}
  public static boolean durable(ItemStack s){var p=owner(s);return p!=null&&equipped(s,p);}
  public static boolean foodDenied(LivingEntity e,ItemStack s){if(!(e instanceof Player p)||!active(p))return false;var f=s.getFoodProperties(p);return f!=null&&f.getNutrition()>Items.BREAD.getFoodProperties().getNutrition();}
@@ -38,5 +47,5 @@ public final class YuleTemperance {
  public static void enforce(Player p){fill(p);if(!active(p))return;for(var slot:EquipmentSlot.values()){var s=p.getItemBySlot(slot);if(s.isDamageableItem()&&s.getDamageValue()>0)s.setDamageValue(0);}if(!(p instanceof ServerPlayer server))return;
   var extra=new ArrayList<ItemStack>();for(int i=0;i<p.getInventory().getContainerSize();i++){var s=p.getInventory().getItem(i);int cap=s.getMaxStackSize();if(s.getCount()>cap)extra.add(s.split(s.getCount()-cap));}var cursor=p.containerMenu.getCarried();if(cursor.getCount()>cursor.getMaxStackSize())extra.add(cursor.split(cursor.getCount()-cursor.getMaxStackSize()));for(var s:extra)YuleGenerosity.redirect(server,s);
  }
- @SubscribeEvent public static void tick(TickEvent.PlayerTickEvent e){enforce(e.player);}
+ @SubscribeEvent public static void tick(TickEvent.PlayerTickEvent e){if(e.phase==TickEvent.Phase.END)enforce(e.player);}
 }

@@ -31,6 +31,8 @@ public final class YuleChastity {
  public static final TagKey<Item> POTIONS=TagKey.create(Registries.ITEM,new ResourceLocation(StarcrownDoll.ID,"chastity_potions"));
  public static final TagKey<MobEffect> CURSES=TagKey.create(Registries.MOB_EFFECT,new ResourceLocation(StarcrownDoll.ID,"chastity_curses"));
  private static final Map<MinecraftServer,Set<EntityType<?>>> NETHER_TYPES=new WeakHashMap<>();
+ private static final List<BlockPos> FREEZE_OFFSETS=freezeOffsets();
+ private static List<BlockPos> freezeOffsets(){var offsets=new ArrayList<BlockPos>();for(int x=-12;x<=12;x++)for(int z=-12;z<=12;z++)if(x*x+z*z<=144)offsets.add(new BlockPos(x,0,z));return List.copyOf(offsets);}
  public static boolean active(Entity e){return YuleHumility.active(e);}
  public static boolean unwanted(MobEffectInstance effect){return effect!=null&&!YuleDiligence.isPenalty(effect)&&(effect.getEffect().getCategory()!=MobEffectCategory.BENEFICIAL||ForgeRegistries.MOB_EFFECTS.tags().getTag(CURSES).contains(effect.getEffect()));}
  public static boolean blockedPotion(LivingEntity e,ItemStack stack){return active(e)&&!(stack.getItem() instanceof ThrowablePotionItem)&&stack.getUseAnimation()==UseAnim.DRINK&&(stack.getItem() instanceof PotionItem||stack.is(POTIONS)||!PotionUtils.getMobEffects(stack).isEmpty());}
@@ -64,12 +66,14 @@ public final class YuleChastity {
  public static void freeze(ServerPlayer p){
   if(!active(p))return;
   var level=p.serverLevel();int y=net.minecraft.util.Mth.floor(p.getY()-.01),cx=p.getBlockX(),cz=p.getBlockZ();
-  for(int dx=-12;dx<=12;dx++)for(int dz=-12;dz<=12;dz++){
-   if(dx*dx+dz*dz>144)continue;var pos=new BlockPos(cx+dx,y,cz+dz);if(!level.hasChunkAt(pos)||!level.getWorldBorder().isWithinBounds(pos)||level.isOutsideBuildHeight(pos))continue;
-   var state=level.getBlockState(pos);if(!(state.getBlock() instanceof LiquidBlock)||!level.getBlockState(pos.above()).isAir()||p.getBoundingBox().intersects(new AABB(pos)))continue;
+  var pos=new BlockPos.MutableBlockPos();var above=new BlockPos.MutableBlockPos();
+  for(var offset:FREEZE_OFFSETS){
+   pos.set(cx+offset.getX(),y,cz+offset.getZ());if(!level.hasChunkAt(pos)||!level.getWorldBorder().isWithinBounds(pos)||level.isOutsideBuildHeight(pos))continue;
+   var state=level.getBlockState(pos);if(!(state.getBlock() instanceof LiquidBlock)||!level.getBlockState(above.set(pos.getX(),y+1,pos.getZ())).isAir()||p.getBoundingBox().intersects(new AABB(pos)))continue;
    var fluid=state.getFluidState();var block=fluid.is(FluidTags.WATER)?Blocks.FROSTED_ICE:fluid.is(FluidTags.LAVA)?Blocks.OBSIDIAN:null;if(block==null)continue;
-   if(net.minecraftforge.event.ForgeEventFactory.onBlockPlace(p,BlockSnapshot.create(level.dimension(),level,pos),Direction.UP))continue;
-   if(level.setBlockAndUpdate(pos,block.defaultBlockState())&&block==Blocks.FROSTED_ICE)level.scheduleTick(pos,block,60+level.random.nextInt(61));
+   var frozen=pos.immutable();
+   if(net.minecraftforge.event.ForgeEventFactory.onBlockPlace(p,BlockSnapshot.create(level.dimension(),level,frozen),Direction.UP))continue;
+   if(level.setBlockAndUpdate(frozen,block.defaultBlockState())&&block==Blocks.FROSTED_ICE)level.scheduleTick(frozen,block,60+level.random.nextInt(61));
   }
  }
  @SubscribeEvent(priority=EventPriority.HIGHEST) public static void interact(PlayerInteractEvent.EntityInteract e){if(blockedInteraction(e.getEntity(),e.getTarget(),e.getItemStack())){e.setCanceled(true);e.setCancellationResult(InteractionResult.FAIL);}}

@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.*;
 @Mixin(ItemStack.class)
 public abstract class TemperanceStack {
  @Inject(method={"getMaxStackSize()I","m_41741_()I"},at=@At("RETURN"),cancellable=true,remap=false,require=1)
- private void cap(CallbackInfoReturnable<Integer> c){if(YuleTemperance.owner((ItemStack)(Object)this)!=null)c.setReturnValue(Math.min(16,c.getReturnValue()));}
+ private void cap(CallbackInfoReturnable<Integer> c){if(c.getReturnValue()>16&&YuleTemperance.owner((ItemStack)(Object)this)!=null)c.setReturnValue(16);}
  @Inject(method={"hurtAndBreak(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V","m_41622_(ILnet/minecraft/world/entity/LivingEntity;Ljava/util/function/Consumer;)V"},at=@At("HEAD"),cancellable=true,remap=false,require=1)
  private void unbroken(int n,LivingEntity e,java.util.function.Consumer<LivingEntity> action,CallbackInfo c){if(YuleTemperance.equipped((ItemStack)(Object)this,e))c.cancel();}
  @Inject(method={"hurt(ILnet/minecraft/util/RandomSource;Lnet/minecraft/server/level/ServerPlayer;)Z","m_220157_(ILnet/minecraft/util/RandomSource;Lnet/minecraft/server/level/ServerPlayer;)Z"},at=@At("HEAD"),cancellable=true,remap=false,require=1)
